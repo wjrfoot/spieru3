@@ -7,12 +7,6 @@
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
-            <groupId>gov.nih.imagej</groupId>
-            <artifactId>imagej</artifactId>
-            <version>1.53</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>jfree</groupId>
             <artifactId>jfreechart</artifactId>
             <version>1.0.13</version>
@@ -22,6 +16,11 @@
             <groupId>org.netbeans.external</groupId>
             <artifactId>AbsoluteLayout</artifactId>
             <version>RELEASE126</version>
+        </dependency>
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>ij</artifactId>
+            <version>1.54d</version>
         </dependency>
     </dependencies>
     <properties>

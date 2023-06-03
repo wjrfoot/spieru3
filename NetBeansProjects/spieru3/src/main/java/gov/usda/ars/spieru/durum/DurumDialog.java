@@ -17,6 +17,7 @@ public class DurumDialog extends javax.swing.JDialog {
 
     private Config config = new Config();
     private File inputFile = null;
+    String durumDialogTitle = null;
     
     /**
      * Creates new form DurumDialog
@@ -25,6 +26,7 @@ public class DurumDialog extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         loadConfig();
+        durumDialogTitle = this.getTitle();
     }
 
     /**
@@ -675,6 +677,7 @@ public class DurumDialog extends javax.swing.JDialog {
 //            System.out.println("selected file: " + fileChooser.getSelectedFile().getAbsolutePath());
             inputFile = fileChooser.getSelectedFile();
             jBRun.setEnabled(true);
+            setTitle(durumDialogTitle + " - " + inputFile.getName());
         }
         
 //        try {
@@ -686,6 +689,8 @@ public class DurumDialog extends javax.swing.JDialog {
 
     }//GEN-LAST:event_jBLoadActionPerformed
 
+//<editor-fold defaultstate="collapsed" desc="actionPerformed/focusLost handlers">
+    
     private void jBRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBRunActionPerformed
         AnalyzeScan analyze = new AnalyzeScan(inputFile.getAbsolutePath(), config);
         analyze.analyze();
@@ -835,6 +840,8 @@ public class DurumDialog extends javax.swing.JDialog {
         JTextField jtf = (JTextField) evt.getSource();
         jtf.selectAll();
     }//GEN-LAST:event_jTFFocusGained
+
+//</editor-fold>
 
     private void loadConfig() {
         config.loadProperties();
