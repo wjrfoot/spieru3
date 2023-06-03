@@ -40,7 +40,7 @@ public class Durum {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                MainDialog dialog = new MainDialog(new javax.swing.JFrame(), false);
+                DurumDialog dialog = new DurumDialog(new javax.swing.JFrame(), false);
 
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
