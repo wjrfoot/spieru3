@@ -688,12 +688,11 @@ public class DurumDialog extends javax.swing.JDialog {
 //        jBAnalyze.setEnabled(true);
 
     }//GEN-LAST:event_jBLoadActionPerformed
-
-//<editor-fold defaultstate="collapsed" desc="actionPerformed/focusLost handlers">
     
     private void jBRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBRunActionPerformed
         AnalyzeScan analyze = new AnalyzeScan(inputFile.getAbsolutePath(), config);
         analyze.analyze();
+        jBRun.setEnabled(false);
     }//GEN-LAST:event_jBRunActionPerformed
 
     private void jBConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBConfigActionPerformed
@@ -707,6 +706,8 @@ public class DurumDialog extends javax.swing.JDialog {
     private void jBAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBAboutActionPerformed
         new About(null, true).setVisible(true);
     }//GEN-LAST:event_jBAboutActionPerformed
+
+//<editor-fold defaultstate="collapsed" desc="actionPerformed/focusLost handlers">
 
     private void jTFFindParticlesminSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFFindParticlesminSizeActionPerformed
         config.setMinSizeFindParticles(((JTextField) evt.getSource()).getText());        // TODO add your handling code here:

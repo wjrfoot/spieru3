@@ -250,143 +250,6 @@ public class AnalyzeScan {
         return subImagePlusList;
     }
 
-    private Roi[] combineRois(Roi[] rois) {
-
-        List<Roi> rtnRois = new ArrayList<>();
-
-        System.out.println("combineRois");
-        for (int idx = 0; idx < rois.length; idx++) {
-            if (rois[idx] == null) {
-                continue;
-            }
-            if (idx == 7) {
-                System.out.println("bp");
-            }
-            Rectangle rect1 = rois[idx].getBounds();
-            for (int jdx = idx + 1; jdx < rois.length; jdx++) {
-                if (rois[jdx] == null) {
-                    continue;
-                }
-                Rectangle rect2 = rois[jdx].getBounds();
-                if (rect1.intersects(rect2)) {
-                    System.out.println(jdx + " intersects " + idx);
-                    Polygon poly1 = rois[idx].getPolygon();
-                    Polygon poly2 = rois[jdx].getPolygon();
-                    int numNewPoints = poly1.npoints + poly2.npoints;
-                    int[] xPoints = new int[numNewPoints];
-                    int[] yPoints = new int[numNewPoints];
-                    for (int pdx = 0; pdx < poly1.npoints; pdx++) {
-                        xPoints[pdx] = poly1.xpoints[pdx];
-                        yPoints[pdx] = poly1.ypoints[pdx];
-                    }
-                    for (int pdx = 0; pdx < poly2.npoints; pdx++) {
-                        xPoints[pdx + poly1.npoints] = poly2.xpoints[pdx];
-                        yPoints[pdx + poly1.npoints] = poly2.ypoints[pdx];
-                    }
-                    Roi newRoi = new PolygonRoi(xPoints, yPoints, numNewPoints, Roi.POLYGON);
-                    rois[idx] = newRoi;
-                    rois[jdx] = null;
-                }
-            }
-        }
-
-        for (int idx = 0; idx < rois.length; idx++) {
-            if (rois[idx] != null) {
-                rtnRois.add(rois[idx]);
-            }
-        }
-
-        Roi[] rtnRoisArr = new Roi[rtnRois.size()];
-        for (int rdx = 0; rdx < rtnRois.size(); rdx++) {
-            rtnRoisArr[rdx] = rtnRois.get(rdx);
-        }
-        return rtnRoisArr;
-    }
-
-    private Roi[] findNearPoints(Roi[] rois) {
-
-        List<Roi> rtnRois = new ArrayList<>();
-
-        System.out.println("findNearPoints");
-        for (int idx = 0; idx < rois.length; idx++) {
-            if (rois[idx] == null) {
-                continue;
-            }
-            if (idx == 7) {
-                System.out.println("bp");
-            }
-            Rectangle rect1 = rois[idx].getBounds();
-            for (int jdx = idx + 1; jdx < rois.length; jdx++) {
-                if (rois[jdx] == null) {
-                    continue;
-                }
-                Rectangle rect2 = rois[jdx].getBounds();
-                if (rect1.intersects(rect2)) {
-                    System.out.println(jdx + " intersects " + idx);
-                    Polygon poly1 = rois[idx].getPolygon();
-                    Polygon poly2 = rois[jdx].getPolygon();
-                    System.out.printf("Intersect %d %d  p1 len %d  p2 len %d\n",
-                            idx, jdx, poly1.npoints, poly2.npoints);
-
-                    // find the first and last points
-                    int p1start = -1;
-                    int p2start = -1;
-                    int p1end = 0;
-                    int p2end = 0;
-
-                    for (int p1x = 0; p1x < poly1.npoints; p1x++) {
-
-                        for (int p2x = poly2.npoints - 1; p2x >= 0; p2x--) {
-
-                            int deltaX = poly1.xpoints[p1x] - poly2.xpoints[p2x];
-                            int deltaY = poly1.ypoints[p1x] - poly2.ypoints[p2x];
-
-                            if (deltaX < 3 && deltaX > -3 && deltaY < 3 && deltaY > -3) {
-                                System.out.printf("p1 %4d x %4d y %4d   p2 %4d x %4d y %4d\n",
-                                        p1x, poly1.xpoints[p1x], poly1.ypoints[p1x],
-                                        p2x, poly2.xpoints[p2x], poly2.ypoints[p2x]);
-                                if (p1start == -1) {
-                                    p1start = p1x;
-                                    p2start = p2x;
-                                }
-                                p1end = p1x;
-                                p2end = p2x;
-                            }
-                        }
-                    }
-
-//                    int numNewPoints = poly1.npoints + poly2.npoints;
-//                    int[] xPoints = new int[numNewPoints];
-//                    int[] yPoints = new int[numNewPoints];
-//                    for (int pdx = 0; pdx < poly1.npoints; pdx++) {
-//                        xPoints[pdx] = poly1.xpoints[pdx];
-//                        yPoints[pdx] = poly1.ypoints[pdx];
-//                    }
-//                    for (int pdx = 0; pdx < poly2.npoints; pdx++) {
-//                        xPoints[pdx + poly1.npoints] = poly2.xpoints[pdx];
-//                        yPoints[pdx + poly1.npoints] = poly2.ypoints[pdx];
-//                    }
-//                    Roi newRoi = new PolygonRoi(xPoints, yPoints, numNewPoints, Roi.POLYGON);
-//                    rois[idx] = newRoi;
-//                    rois[jdx] = null;
-                }
-            }
-        }
-
-////        for (int idx = 0; idx < rois.length; idx++) {
-////            if (rois[idx] != null) {
-////                rtnRois.add(rois[idx]);
-////            }
-////        }
-////
-////        Roi[] rtnRoisArr = new Roi[rtnRois.size()];
-////        for (int rdx = 0; rdx < rtnRois.size(); rdx++) {
-////            rtnRoisArr[rdx] = rtnRois.get(rdx);
-////        }
-//        return rtnRoisArr;
-        return null;
-    }
-
     /**
      *
      * @param filNam
@@ -401,33 +264,34 @@ public class AnalyzeScan {
     private Roi[] FindROIs(ImagePlus baseImagePlus) {
 
         baseImagePlus.show();
+        baseImagePlus.getCanvas().addMouseListener(new MyMouseListner(baseImagePlus));
 
         ImagePlus imp = baseImagePlus.duplicate();
 
-//        IJ.run(imp, "Gaussian Blur...", "sigma=3");
-//        IJ.run(imp, "Convert to Mask", "");
-//        imp = imp.resize(842, 1310, "bilinear");
-//        IJ.run(imp, "Convert to Mask", "");
-//        IJ.run(imp, "Fill Holes", "");
-//        IJ.run(imp, "Watershed", "");
-//        imp = imp.resize(1684, 2620, "bilinear");
-//        IJ.run(imp, "Convert to Mask", "");
-
-        ImageConverter ic = new ImageConverter(imp);
-        ic.convertToGray8();
-        imp.getProcessor().setAutoThreshold("Default dark no-reset");
-//        IJ.run(imp, "8-bit", "");
-        ImageConverter imageConverter = new ImageConverter(imp);
-        imageConverter.convertToGray8();
-//        IJ.run(imp, "Auto Threshold", "method=Default white");
-//        imp.getProcessor().setAutoThreshold("Default mask");
+        IJ.run(imp, "Gaussian Blur...", "sigma=3");
         IJ.run(imp, "Convert to Mask", "");
-        IJ.run(imp, "Watershed", "iterations=1 count=1 black do=Close");
+        imp = imp.resize(842, 1310, "bilinear");
+        IJ.run(imp, "Convert to Mask", "");
+        IJ.run(imp, "Fill Holes", "");
+        IJ.run(imp, "Watershed", "");
+        imp = imp.resize(1684, 2620, "bilinear");
+        IJ.run(imp, "Convert to Mask", "");
 
-
-        EDM edm = new EDM();
-        edm.setup("watershed", imp);
-        edm.run(imp.getProcessor());
+//        ImageConverter ic = new ImageConverter(imp);
+//        ic.convertToGray8();
+//        imp.getProcessor().setAutoThreshold("Default dark no-reset");
+////        IJ.run(imp, "8-bit", "");
+//        ImageConverter imageConverter = new ImageConverter(imp);
+//        imageConverter.convertToGray8();
+////        IJ.run(imp, "Auto Threshold", "method=Default white");
+////        imp.getProcessor().setAutoThreshold("Default mask");
+//        IJ.run(imp, "Convert to Mask", "");
+//        IJ.run(imp, "Watershed", "iterations=1 count=1 black do=Close");
+//
+//
+//        EDM edm = new EDM();
+//        edm.setup("watershed", imp);
+//        edm.run(imp.getProcessor());
 
 //        IJ.analyze(imp, "Find Edges", "");  // testing
         RoiManager roiManager = new RoiManager(false);
@@ -464,7 +328,7 @@ public class AnalyzeScan {
 
         ImagePlus ip = sip.getKernelIP().duplicate();
 
-        ip.duplicate().show();
+//        ip.duplicate().show();
 
         ip.setTitle("process kernel");
 
@@ -502,7 +366,7 @@ public class AnalyzeScan {
         particleAnalyzer.analyze(ip);
 
         // save last results, full, table entry into kernel object
-        ip.show();
+//        ip.show();
         if (resultsTable.getCounter() == 0) {
             sip.setKernelResults("a\ta\ta");
             sip.setKernelArea(0.0);
