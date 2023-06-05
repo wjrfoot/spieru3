@@ -6,25 +6,23 @@ package gov.usda.ars.spieru.durum;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.gui.PolygonRoi;
 import ij.gui.Roi;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
-import ij.plugin.filter.BackgroundSubtracter;
-import ij.plugin.filter.EDM;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -61,6 +59,7 @@ public class AnalyzeScan {
     private double threshold = 160;
 
     private double[] buckets = {0.1, 0.2, 0.5, 1.0};
+    private String[] xLabels = {"Min", "Lo", "Med", "Hi"};
 
     ResultsTable resultsTable = new ResultsTable();
 
@@ -113,9 +112,6 @@ public class AnalyzeScan {
 
         Roi[] rois = FindROIs(baseIP);
 
-//        findNearPoints(rois);
-//
-//        rois = combineRois(rois);
         subImagePlusList = makeSubImagePlusList(baseIP, rois);
 
         PrintWriter pw = null;
@@ -134,7 +130,7 @@ public class AnalyzeScan {
 
                 processChalk(sip);
 
-                processResults(sip, pw, cnt++);
+                processResults(sip, pw, cnt++, false);
 
             }
             System.out.println("done process");
@@ -145,8 +141,10 @@ public class AnalyzeScan {
         }
 
         // create bar chart output
+        //@todo make buckets and xLabels configurable
         EventQueue.invokeLater(() -> {
-            ResultsBarChart ex = new ResultsBarChart(subImagePlusList, buckets);
+            ResultsBarChart ex = new ResultsBarChart(subImagePlusList, buckets, 
+                    xLabels, fileName);
             ex.setVisible(true);
         });
 
@@ -159,9 +157,6 @@ public class AnalyzeScan {
      * @param sip
      * @param pw
      */
-    private void processResults(SubImagePlus sip, PrintWriter pw, int idx) {
-        processResults(sip, pw, idx, false);
-    }
 
     private void processResults(SubImagePlus sip, PrintWriter pw, int idx, boolean visibleFlg) {
         if (pw != null) {
@@ -175,28 +170,22 @@ public class AnalyzeScan {
             sipf.getChalkJTF().setText(sip.getChalkResults().split("\\t")[1]);
             sipf.getKernelJTF().setText(sip.getKernelResults().split("\\t")[1]);
             ImagePlus kip = sip.getKernelIP();
-//            ImagePlus kip = sip.getKernelIP().duplicate();
-//            sip.getKernelIP().show();
-//            kip.resize(50, 50, "none");
-            kip.setTitle("kip");
-//            kip.show();
             sipf.getKernelPitJL().setIcon(new ImageIcon(kip.getImage()));
-//            sipf.getKernelPitJL().setIcon(new ImageIcon(sip.getKernelIP().getImage()));
             ImagePlus cip = sip.getChalkIP();
-//            cip.resize(60, 60, "none");
             sipf.getChalkPictJL().setIcon(new ImageIcon(cip.getImage()));
-//            sipf.getChalkPictJL().setIcon(new ImageIcon(sip.getChalkIP().getImage()));
             sipf.getOriginalPitJL().setIcon(new ImageIcon(sip.getOriginalIP().getImage()));
             double kernel = sip.getKernelArea();
             double chalk = sip.getChalkArea();
-//            double kernel = Double.parseDouble(sip.getKernelResults().split("\\t")[1]);
-//            double chalk = Double.parseDouble(sip.getChalkResults().split("\\t")[1]);
             if (new Double(kernel).equals(chalk)) {
                 chalk = 0.0;
             }
             String temp = (kernel == chalk) ? "invalid"
                     : new DecimalFormat("##").format((chalk / kernel) * 100.) + "%"; // rounded to 2 decimal places
             sipf.getPercentJTF().setText(temp);
+            GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+            int width = gd.getDisplayMode().getWidth();
+//            int height = gd.getDisplayMode().getHeight();
+            sipf.setLocation(width / 2, 10);
             sipf.setVisible(visibleFlg);
         });
 
@@ -224,23 +213,12 @@ public class AnalyzeScan {
         List<SubImagePlus> subImagePlusList = new ArrayList<>();
 
         for (Roi roi : rois) {
-//            System.out.println("roi cnt " + roi.getPolygon().npoints);
-
             baseImp.setRoi(roi);
-            Rectangle boundingBox = roi.getBounds();
             baseImp.cut();
             ImagePlus impRoi = IJ.createImage(roi.getName(), "RGB black", 256, 256, 1);
-//            ImagePlus impRoi = IJ.createImage(roi.getName(), "RGB black", boundingBox.height, boundingBox.width, 1);
-
             impRoi.paste();
-//            impRoi.paste(0,0);
-//            impRoi.show();
-//            IJ.run(impRoi, "Find Edges", "");
             impRoi.setTitle("kernel " + cnt++);
-//            impRoi.show();
-//            System.out.println("roi " + cnt);
             SubImagePlus sip = new SubImagePlus(impRoi, roi);
-
             sip.setKernelIP(impRoi);
             writeIP(impRoi);
             subImagePlusList.add(sip);
@@ -255,11 +233,6 @@ public class AnalyzeScan {
      * @param filNam
      *
      *
-     * Implements the following imagej commands to create an image where there
-     * are breaks between the kernels. analyze("8-bit");
-     * setAutoThreshold("Default dark no-reset"); setOption("BlackBackground",
-     * true); analyze("Convert to Mask"); analyze("Options...", "iterations=1
-     * count=1 black do=Close"); analyze("watershed");
      */
     private Roi[] FindROIs(ImagePlus baseImagePlus) {
 
@@ -277,23 +250,6 @@ public class AnalyzeScan {
         imp = imp.resize(1684, 2620, "bilinear");
         IJ.run(imp, "Convert to Mask", "");
 
-//        ImageConverter ic = new ImageConverter(imp);
-//        ic.convertToGray8();
-//        imp.getProcessor().setAutoThreshold("Default dark no-reset");
-////        IJ.run(imp, "8-bit", "");
-//        ImageConverter imageConverter = new ImageConverter(imp);
-//        imageConverter.convertToGray8();
-////        IJ.run(imp, "Auto Threshold", "method=Default white");
-////        imp.getProcessor().setAutoThreshold("Default mask");
-//        IJ.run(imp, "Convert to Mask", "");
-//        IJ.run(imp, "Watershed", "iterations=1 count=1 black do=Close");
-//
-//
-//        EDM edm = new EDM();
-//        edm.setup("watershed", imp);
-//        edm.run(imp.getProcessor());
-
-//        IJ.analyze(imp, "Find Edges", "");  // testing
         RoiManager roiManager = new RoiManager(false);
         ResultsTable resultsTable = new ResultsTable();
 
@@ -329,7 +285,6 @@ public class AnalyzeScan {
         ImagePlus ip = sip.getKernelIP().duplicate();
 
 //        ip.duplicate().show();
-
         ip.setTitle("process kernel");
 
 //	// analyze particles
@@ -426,15 +381,6 @@ public class AnalyzeScan {
                 config.getMinCircChalk(0), config.getMaxCircChalk(0));
         particleAnalyzer.analyze(ip);
 
-//        IJ.run(ip, "Analyze Particles...", "size=10-30000 circularity=0.1-1.00");
-//                ResultsTable resultsTable = new ResultsTable();
-//
-//        ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE, Measurements.AREA,
-//                resultsTable, minSize, maxSize, minCirc, maxCirc);
-//        resultsTable.reset();
-//        particleAnalyzer.analyze(ip);
-        // save last results, chalk< table entry into kernel object
-//        String resultsStr = ResultsTable.getResultsTable().getRowAsString(ResultsTable.getResultsTable().getCounter() - 1);
         if (resultsTable.getCounter() <= 0) {
             sip.setChalkResults("a\ta\ta");
             sip.setChalkArea(0.0);

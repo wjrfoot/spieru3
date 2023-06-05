@@ -19,17 +19,32 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.io.File;
 import java.util.List;
 
 public class ResultsBarChart extends JFrame {
 
     List<SubImagePlus> subImagePlusList;
     private double[] bounds;
-
+    private String[] labels;
+    private String inputFileName;
+    private String fileName;
+    
     public ResultsBarChart(List<SubImagePlus> subImagePlusList, double[] bounds) {
 
         this.subImagePlusList = subImagePlusList;
         this.bounds = bounds;
+        initUI();
+    }
+
+    public ResultsBarChart(List<SubImagePlus> subImagePlusList, double[] bounds, 
+            String[] yLabels, String inputFileName) {
+
+        this.subImagePlusList = subImagePlusList;
+        this.bounds = bounds;
+        this.labels = yLabels;
+        this.inputFileName = inputFileName;
+        fileName = new File(inputFileName).getName();
         initUI();
     }
 
@@ -49,7 +64,7 @@ public class ResultsBarChart extends JFrame {
         add(chartPanel);
 
         pack();
-        setTitle("Bar chart");
+        setTitle("Bar chart " + inputFileName);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
@@ -85,7 +100,7 @@ public class ResultsBarChart extends JFrame {
                 }
             }
             for (int idx = 0; idx < bounds.length; idx++) {
-                dataset.setValue(count[idx], "Gold medals", ""+ bounds[idx]);
+                dataset.setValue(count[idx], "Gold medals", labels[idx]);
             }
         }
         return dataset;
@@ -94,13 +109,12 @@ public class ResultsBarChart extends JFrame {
     private JFreeChart createChart(CategoryDataset dataset) {
 
         JFreeChart barChart = ChartFactory.createBarChart(
-                "Chalk Kernel Analysis (need to add name here)",
+                "Chalk Kernel Analysis " + fileName,
                 "",
                 "Count",
                 dataset,
                 PlotOrientation.VERTICAL,
                 false, true, false);
-
         return barChart;
     }
 
