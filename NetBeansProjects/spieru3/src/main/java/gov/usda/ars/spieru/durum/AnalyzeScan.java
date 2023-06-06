@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.text.DecimalFormat;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -69,7 +70,7 @@ public class AnalyzeScan {
     public static void main(String[] args) {
         System.out.println("starting analyze");
         File dirF = new File(System.getProperty("user.dir"), "images");
-        File imageF = new File(dirF, "img014.tif");
+        File imageF = new File(dirF, "img012.tif");
         System.out.println("filename " + dirF.getAbsolutePath() + " " + dirF.exists());
         Config config = new Config();
         config.loadProperties();
@@ -116,6 +117,8 @@ public class AnalyzeScan {
 
         PrintWriter pw = null;
 
+        List<DetailOutput> detailOutputList = new ArrayList<>();
+
         try {
             File dirF = new File(System.getProperty("user.dir"), "data");
             String fileName = System.currentTimeMillis() + ".txt";
@@ -126,12 +129,16 @@ public class AnalyzeScan {
 
             for (SubImagePlus sip : subImagePlusList) {
 
-                processKernel(sip, cnt);
+                DetailOutput detailOutput = new DetailOutput();
+                detailOutput.setFileName(new File(getFileName()).getName());
 
-                processChalk(sip);
+                processKernel(sip, detailOutput);
+
+                processChalk(sip, detailOutput);
 
                 processResults(sip, pw, cnt++, false);
 
+                detailOutputList.add(detailOutput);
             }
             System.out.println("done process");
         } catch (IOException ex) {
@@ -141,12 +148,58 @@ public class AnalyzeScan {
         }
 
         // create bar chart output
-        //@todo make buckets and xLabels configurable
+        // @todo make buckets and xLabels configurable
         EventQueue.invokeLater(() -> {
-            ResultsBarChart ex = new ResultsBarChart(subImagePlusList, buckets, 
+            ResultsBarChart ex = new ResultsBarChart(subImagePlusList, buckets,
                     xLabels, fileName);
             ex.setVisible(true);
         });
+
+        updateSpreadSheet(detailOutputList);
+
+    }
+
+    private SummaryOutput calcSummaryInfo(List<DetailOutput> detailOutputList) {
+
+        SummaryOutput summaryOutput = new SummaryOutput();
+
+        double kernelArea = 0;
+        double chalkArea = 0;
+        int count = 0;
+
+        for (DetailOutput detailOutput : detailOutputList) {
+            chalkArea += detailOutput.getChalkArea();
+            kernelArea += detailOutput.getKernelArea();
+            count++;
+        }
+
+        summaryOutput.setChalkArea(chalkArea);
+        summaryOutput.setKernelArea(kernelArea);
+        summaryOutput.setCount(count);
+        String subFileName = new File(fileName).getName();
+        subFileName = subFileName.substring(0, subFileName.indexOf("."));
+        summaryOutput.setSampleFileName(subFileName);
+        summaryOutput.setChalkHiThreshold(config.getHiThresholdChalk(0));
+        summaryOutput.setChalkLoThreshold(config.getLowThresholdChalk(0));
+        summaryOutput.setKernelHiThreshold(config.getHiThresholdKernel(0));
+        summaryOutput.setKernelLoThreshold(config.getLowThresholdKernel(0));
+
+        return summaryOutput;
+    }
+
+    void updateSpreadSheet(List<DetailOutput> detailOutputList) {
+
+        SummaryOutput summaryOutput = calcSummaryInfo(detailOutputList);
+
+        Spreadsheet spreadsheet = new Spreadsheet();
+
+        spreadsheet.openXLS();
+
+        spreadsheet.addSummaryLine(summaryOutput);
+
+        spreadsheet.addDetailLines(summaryOutput, detailOutputList);
+
+        spreadsheet.writeXLSFile();
 
     }
 
@@ -157,7 +210,6 @@ public class AnalyzeScan {
      * @param sip
      * @param pw
      */
-
     private void processResults(SubImagePlus sip, PrintWriter pw, int idx, boolean visibleFlg) {
         if (pw != null) {
             pw.println(sip.getKernelResults().split("\\t")[1] + "  ---  " + sip.getChalkResults().split("\\t")[1]);
@@ -280,7 +332,7 @@ public class AnalyzeScan {
      *
      * @param sip
      */
-    private void processKernel(SubImagePlus sip, int cnt) {
+    private void processKernel(SubImagePlus sip, DetailOutput detailOutput) {
 
         ImagePlus ip = sip.getKernelIP().duplicate();
 
@@ -328,7 +380,8 @@ public class AnalyzeScan {
 
         } else {
             String resultsStr = resultsTable.getRowAsString(0);
-            System.out.println("kernel " + cnt + " area " + resultsTable.getValue("Area", 0));
+            System.out.println("kernel " + " area " + resultsTable.getValue("Area", 0));
+            detailOutput.setKernelArea(resultsTable.getValue("Area", 0));
 //        String resultsStr = ResultsTable.getResultsTable().getRowAsString(ResultsTable.getResultsTable().getCounter() - 1);
             sip.setKernelResults(resultsStr);
             sip.setKernelArea(resultsTable.getValue("Area", 0));
@@ -342,7 +395,7 @@ public class AnalyzeScan {
      *
      * @param sip
      */
-    private void processChalk(SubImagePlus sip) {
+    private void processChalk(SubImagePlus sip, DetailOutput detailOutput) {
 
         ImagePlus ip = sip.getKernelIP().duplicate();
 
@@ -384,9 +437,12 @@ public class AnalyzeScan {
         if (resultsTable.getCounter() <= 0) {
             sip.setChalkResults("a\ta\ta");
             sip.setChalkArea(0.0);
+            detailOutput.setChalkArea(0.0);
         } else {
 //        String resultsStr = resultsTable.getRowAsString(0);
+            System.out.println("chalk " + " area " + resultsTable.getValue("Area", 0));
             String resultsStr = resultsTable.getRowAsString(resultsTable.getCounter() - 1);
+            detailOutput.setChalkArea(resultsTable.getValue("Area", 0));
             sip.setChalkResults(resultsStr);
             double area = resultsTable.getValue("Area", resultsTable.getCounter() - 1);
             sip.setChalkArea(area);
