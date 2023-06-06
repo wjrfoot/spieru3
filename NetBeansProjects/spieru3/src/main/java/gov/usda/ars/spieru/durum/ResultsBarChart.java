@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.io.File;
 import java.util.List;
+import javax.swing.WindowConstants;
 
 public class ResultsBarChart extends JFrame {
 
@@ -46,8 +47,11 @@ public class ResultsBarChart extends JFrame {
         this.inputFileName = inputFileName;
         fileName = new File(inputFileName).getName();
         initUI();
+        
     }
 
+    
+    
     public ResultsBarChart() {
 
         this(null, null);
