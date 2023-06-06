@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.text.DecimalFormat;
+import javax.swing.WindowConstants;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
@@ -67,7 +68,10 @@ public class AnalyzeScan {
     ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE, Measurements.AREA,
             resultsTable, minSize, maxSize, minCirc, maxCirc);
 
+    private static boolean exitFlg = false;
+
     public static void main(String[] args) {
+        exitFlg = true;
         System.out.println("starting analyze");
         File dirF = new File(System.getProperty("user.dir"), "images");
         File imageF = new File(dirF, "img012.tif");
@@ -152,6 +156,9 @@ public class AnalyzeScan {
         EventQueue.invokeLater(() -> {
             ResultsBarChart ex = new ResultsBarChart(subImagePlusList, buckets,
                     xLabels, fileName);
+            if (exitFlg) {
+                ex.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            }
             ex.setVisible(true);
         });
 
