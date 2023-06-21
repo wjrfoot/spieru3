@@ -28,6 +28,34 @@ public class Config {
     //<editor-fold defaultstate="collapsed" desc="getters/setters">
     
     /**
+     * @return the outputFileName
+     */
+    public String getOutputFileName() {
+        return outputFileName;
+    }
+
+    /**
+     * @param outputFileName the outputFileName to set
+     */
+    public void setOutputFileName(String outputFileName) {
+        this.outputFileName = outputFileName;
+    }
+
+    /**
+     * @return the outputDirectory
+     */
+    public String getOutputDirectory() {
+        return outputDirectory;
+    }
+
+    /**
+     * @param outputDirectory the outputDirectory to set
+     */
+    public void setOutputDirectory(String outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    /**
      * @return the lastImageDirectory
      */
     public String getLastImageDirectory() {
@@ -353,6 +381,8 @@ public class Config {
     private String KernelMaxCirc = "KernelMaxCirc";
     
     private String LastImageDirectory = "LastInputDirectory";
+    private String OutputFileName = "OutputFileName";
+    private String OutputDirectory = "OutputDirectory";
 
     public static void main(String[] args) {  // quick and dirty instead of using junit
         String dirS = System.getProperty("user.home");
@@ -390,6 +420,8 @@ public class Config {
     private String maxCircChalk = "0.98";
     
     private String lastImageDirectory = System.getProperty("user.home") + "\\Documents";
+    private String outputFileName = "dumum";
+    private String outputDirectory = System.getProperty("user.home") + "\\Documents";
     
     public void loadProperties() {
         File localDir = new File(System.getProperty("user.home"), "AppData\\Local\\ARS-SPIERU");
@@ -420,6 +452,8 @@ public class Config {
                     setMaxSizeChalk((String) properties.get(ChalkMaxSize));
                     
                     setLastImageDirectory((String) properties.getProperty(LastImageDirectory));
+                    setOutputFileName((String) properties.getProperty(OutputFileName));
+                    setOutputDirectory((String) properties.getProperty(OutputDirectory));
 
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Config.class.getName()).log(Level.SEVERE, null, ex);
@@ -453,6 +487,8 @@ public class Config {
         properties.setProperty(ChalkMaxCirc, getMaxCircChalk());
         
         properties.setProperty(LastImageDirectory, getLastImageDirectory());
+        properties.setProperty(OutputFileName, getOutputFileName());
+        properties.setProperty(OutputDirectory, getOutputDirectory());
         
         File localDir = new File(System.getProperty("user.home"), "AppData\\Local\\ARS-SPIERU");
         if (!localDir.exists()) {

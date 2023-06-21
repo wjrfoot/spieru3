@@ -108,7 +108,8 @@ public class AnalyzeScan {
 
         ImagePlus baseIP = IJ.openImage(getFileName());
         baseIP.getProcessor().flipHorizontal();
-        baseIP.setTitle("original image");
+        File file = new File(getFileName());        
+        baseIP.setTitle(file.getName());
         baseIP.show();
         baseIP = baseIP.duplicate();
 
@@ -296,7 +297,8 @@ public class AnalyzeScan {
         baseImagePlus.getCanvas().addMouseListener(new MyMouseListner(baseImagePlus));
 
         ImagePlus imp = baseImagePlus.duplicate();
-
+        imp.setTitle(getFileName());
+        
         int[] dims = imp.getDimensions();
         
         

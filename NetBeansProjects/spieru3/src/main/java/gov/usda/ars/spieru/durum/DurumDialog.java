@@ -5,8 +5,10 @@
 package gov.usda.ars.spieru.durum;
 
 import java.io.File;
+import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -17,8 +19,9 @@ public class DurumDialog extends javax.swing.JDialog {
 
     private Config config = new Config();
     private File inputFile = null;
+    private File[] inputFiles = null;
     String durumDialogTitle = null;
-    
+
     /**
      * Creates new form DurumDialog
      */
@@ -27,6 +30,8 @@ public class DurumDialog extends javax.swing.JDialog {
         initComponents();
         loadConfig();
         durumDialogTitle = this.getTitle();
+        Icon icon = UIManager.getIcon("FileView.directoryIcon");
+        jBSelectOutputDirectory.setIcon(icon);
     }
 
     /**
@@ -78,6 +83,12 @@ public class DurumDialog extends javax.swing.JDialog {
         jLabel23 = new javax.swing.JLabel();
         jTFChalkmaxCirc = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
+        jPOutput = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jTFOutputFileName = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jTFOutputDirectory = new javax.swing.JTextField();
+        jBSelectOutputDirectory = new javax.swing.JButton();
         jPButtons = new javax.swing.JPanel();
         jBLoad = new javax.swing.JButton();
         jBRun = new javax.swing.JButton();
@@ -350,7 +361,7 @@ public class DurumDialog extends javax.swing.JDialog {
                         .addComponent(jLabel16)
                         .addGap(18, 18, 18)
                         .addComponent(jTFKernelmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(101, Short.MAX_VALUE))
         );
         jPBaseAnalysisLayout.setVerticalGroup(
             jPBaseAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -545,6 +556,65 @@ public class DurumDialog extends javax.swing.JDialog {
                     .addComponent(jTFChalkmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
+        jPOutput.setBorder(javax.swing.BorderFactory.createTitledBorder("Output"));
+
+        jLabel1.setText("File Name");
+
+        jTFOutputFileName.setText("jTextField1");
+        jTFOutputFileName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTFFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTFOutputFileNameFocusLost(evt);
+            }
+        });
+        jTFOutputFileName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTFOutputFileNameActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Directory");
+
+        jTFOutputDirectory.setText("jTextField2");
+
+        jBSelectOutputDirectory.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBSelectOutputDirectoryActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPOutputLayout = new javax.swing.GroupLayout(jPOutput);
+        jPOutput.setLayout(jPOutputLayout);
+        jPOutputLayout.setHorizontalGroup(
+            jPOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPOutputLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jTFOutputFileName, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jTFOutputDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jBSelectOutputDirectory)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPOutputLayout.setVerticalGroup(
+            jPOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPOutputLayout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addGroup(jPOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jTFOutputFileName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3)
+                    .addComponent(jTFOutputDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBSelectOutputDirectory))
+                .addContainerGap(29, Short.MAX_VALUE))
+        );
+
         jBLoad.setText("Load");
         jBLoad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -599,7 +669,7 @@ public class DurumDialog extends javax.swing.JDialog {
                 .addGroup(jPButtonsLayout.createSequentialGroup()
                     .addGap(52, 52, 52)
                     .addComponent(jBLoad)
-                    .addContainerGap(552, Short.MAX_VALUE)))
+                    .addContainerGap(659, Short.MAX_VALUE)))
         );
         jPButtonsLayout.setVerticalGroup(
             jPButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -615,7 +685,7 @@ public class DurumDialog extends javax.swing.JDialog {
                 .addGroup(jPButtonsLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(jBLoad)
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addContainerGap(16, Short.MAX_VALUE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -628,8 +698,9 @@ public class DurumDialog extends javax.swing.JDialog {
                     .addComponent(jPBaseAnalysis, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPFindParticles, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPChalkAnalysis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPOutput, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -640,9 +711,11 @@ public class DurumDialog extends javax.swing.JDialog {
                 .addComponent(jPBaseAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPChalkAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPOutput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -653,8 +726,8 @@ public class DurumDialog extends javax.swing.JDialog {
         fileChooser.setMultiSelectionEnabled(false);
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setFileHidingEnabled(false);
-        fileChooser.setMultiSelectionEnabled(false);
-        
+        fileChooser.setMultiSelectionEnabled(true);
+
         Config fileConfig = new Config();
         fileConfig.loadProperties();
 //        File dirF = new File(System.getProperty("user.dir"), "images");
@@ -677,18 +750,18 @@ public class DurumDialog extends javax.swing.JDialog {
             }
         });
 
-        
         if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 //            fils = fileChooser.getSelectedFiles();
 //            System.out.println("selected file: " + fileChooser.getSelectedFile().getAbsolutePath());
             inputFile = fileChooser.getSelectedFile();
+            inputFiles = fileChooser.getSelectedFiles();
             jBRun.setEnabled(true);
             setTitle(durumDialogTitle + " - " + inputFile.getName());
             fileConfig.setLastImageDirectory(inputFile.getParent());
             fileConfig.saveProperties();
             config.setLastImageDirectory(inputFile.getParent());
         }
-        
+
 //        try {
 //            config.setLastInputDirectory(fils[0].getCanonicalFile().getParent());
 //        } catch (IOException ex) {
@@ -697,11 +770,56 @@ public class DurumDialog extends javax.swing.JDialog {
 //        jBAnalyze.setEnabled(true);
 
     }//GEN-LAST:event_jBLoadActionPerformed
-    
+
+    private void jBSelectOutputDirectoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBSelectOutputDirectoryActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setFileHidingEnabled(false);
+        fileChooser.setMultiSelectionEnabled(false);
+        fileChooser.setApproveButtonText("Select");
+
+        Config fileConfig = new Config();
+        fileConfig.loadProperties();
+//        File dirF = new File(System.getProperty("user.dir"), "images");
+//        fileChooser.setCurrentDirectory(dirF);
+        File dirF = new File(fileConfig.getOutputDirectory());
+        fileChooser.setSelectedFile(dirF);
+//        fileChooser.setCurrentDirectory(new File(lastInputDirectory));
+        fileChooser.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File arg0) {
+                return arg0.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+        });
+
+        if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            String outputDirPath = fileChooser.getSelectedFile().getAbsolutePath();
+            jTFOutputDirectory.setText(outputDirPath);
+            fileConfig.setOutputDirectory(outputDirPath);
+            fileConfig.saveProperties();
+            config.setOutputDirectory(outputDirPath);
+        }
+
+    }//GEN-LAST:event_jBSelectOutputDirectoryActionPerformed
+
     private void jBRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBRunActionPerformed
-        AnalyzeScan analyze = new AnalyzeScan(inputFile.getAbsolutePath(), config);
-        analyze.analyze();
+
+        for (File fil : inputFiles) {
+            AnalyzeScan analyze = new AnalyzeScan(fil.getAbsolutePath(), config);
+            analyze.analyze();
+        }
+
         jBRun.setEnabled(false);
+//        AnalyzeScan analyze = new AnalyzeScan(inputFile.getAbsolutePath(), config);
+//        analyze.analyze();
+//        jBRun.setEnabled(false);
+
     }//GEN-LAST:event_jBRunActionPerformed
 
     private void jBConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBConfigActionPerformed
@@ -723,7 +841,7 @@ public class DurumDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTFFindParticlesminSizeActionPerformed
 
     private void jTFFindParticlesminSizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFFindParticlesminSizeFocusLost
-        config.setMinSizeKernel(((JTextField) evt.getSource()).getText());        // TODO add your handling code here:
+        config.setMinSizeFindParticles(((JTextField) evt.getSource()).getText());        // TODO add your handling code here:
     }//GEN-LAST:event_jTFFindParticlesminSizeFocusLost
 
     private void jTFFindParticlesmaxSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFFindParticlesmaxSizeActionPerformed
@@ -767,7 +885,7 @@ public class DurumDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_jTFKernelhighThresFocusLost
 
     private void jTFKernelminSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFKernelminSizeActionPerformed
-        config.setMinSizeKernel(((JTextField) evt.getSource()).getText());        
+        config.setMinSizeKernel(((JTextField) evt.getSource()).getText());
     }//GEN-LAST:event_jTFKernelminSizeActionPerformed
 
     private void jTFKernelminSizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFKernelminSizeFocusLost
@@ -851,8 +969,23 @@ public class DurumDialog extends javax.swing.JDialog {
         jtf.selectAll();
     }//GEN-LAST:event_jTFFocusGained
 
-//</editor-fold>
+    private void jTFOutputFileNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFOutputFileNameActionPerformed
+        config.setOutputFileName(((JTextField) evt.getSource()).getText());
+        Config fileConfig = new Config();
+        fileConfig.loadProperties();
+        fileConfig.setOutputFileName(((JTextField) evt.getSource()).getText());
+        fileConfig.saveProperties();
+    }//GEN-LAST:event_jTFOutputFileNameActionPerformed
 
+    private void jTFOutputFileNameFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFOutputFileNameFocusLost
+        config.setOutputFileName(((JTextField) evt.getSource()).getText());
+        Config fileConfig = new Config();
+        fileConfig.loadProperties();
+        fileConfig.setOutputFileName(((JTextField) evt.getSource()).getText());
+        fileConfig.saveProperties();
+    }//GEN-LAST:event_jTFOutputFileNameFocusLost
+
+//</editor-fold>
     private void loadConfig() {
         config.loadProperties();
 
@@ -874,6 +1007,9 @@ public class DurumDialog extends javax.swing.JDialog {
         jTFChalkmaxSize.setText(config.getMaxSizeChalk());
         jTFChalkminCirc.setText(config.getMinCircChalk());
         jTFChalkminSize.setText(config.getMinSizeChalk());
+
+        jTFOutputFileName.setText(config.getOutputFileName());
+        jTFOutputDirectory.setText(config.getOutputDirectory());
     }
 
     /**
@@ -927,6 +1063,8 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JButton jBExit;
     private javax.swing.JButton jBLoad;
     private javax.swing.JButton jBRun;
+    private javax.swing.JButton jBSelectOutputDirectory;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -943,6 +1081,7 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -952,6 +1091,7 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPButtons;
     private javax.swing.JPanel jPChalkAnalysis;
     private javax.swing.JPanel jPFindParticles;
+    private javax.swing.JPanel jPOutput;
     private javax.swing.JTextField jTFChalkhighThres;
     private javax.swing.JTextField jTFChalklowThres;
     private javax.swing.JTextField jTFChalkmaxCirc;
@@ -968,5 +1108,7 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JTextField jTFKernelmaxSize;
     private javax.swing.JTextField jTFKernelminCirc;
     private javax.swing.JTextField jTFKernelminSize;
+    private javax.swing.JTextField jTFOutputDirectory;
+    private javax.swing.JTextField jTFOutputFileName;
     // End of variables declaration//GEN-END:variables
 }

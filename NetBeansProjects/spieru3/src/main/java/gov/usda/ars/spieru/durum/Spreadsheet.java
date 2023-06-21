@@ -80,6 +80,10 @@ public class Spreadsheet {
      */
     public XSSFWorkbook openXLS() {
 
+        Config config = new Config();
+        config.loadProperties();
+        setFileDir(config.getOutputDirectory());
+        setFileName(config.getOutputFileName() + ".xlsx");
         File parent = new File(getFileDir());
         if (!parent.exists()) {
             parent.mkdirs();
