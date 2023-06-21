@@ -186,7 +186,7 @@ public class Spreadsheet {
 
     void addDetailTitles(XSSFSheet sheet) {
 
-        String[] items = {"Chalk", "Kernel"};
+        String[] items = {"#", "Kernel", "Chalk"};
         int rowNum = sheet.getLastRowNum() + 2;
         XSSFRow row = sheet.createRow(rowNum);
 
@@ -203,12 +203,15 @@ public class Spreadsheet {
     void addDetailLines(XSSFSheet sheet, List<DetailOutput> detailOutputList) {
 
         int rowNum = sheet.getLastRowNum() + 2;
+        int rowID = 1;
 
         for (DetailOutput detailOutput : detailOutputList) {
             
             int cellid = 0;
             XSSFRow row = sheet.createRow(rowNum++);
             Cell cell = row.createCell(cellid++);
+            cell.setCellValue(rowID++);
+            cell = row.createCell(cellid++);
             cell.setCellValue(detailOutput.getKernelArea());
             cell = row.createCell(cellid++);
             cell.setCellValue(detailOutput.getChalkArea());

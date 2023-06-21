@@ -28,6 +28,20 @@ public class Config {
     //<editor-fold defaultstate="collapsed" desc="getters/setters">
     
     /**
+     * @return the lastImageDirectory
+     */
+    public String getLastImageDirectory() {
+        return lastImageDirectory;
+    }
+
+    /**
+     * @param lastImageDirectory the lastImageDirectory to set
+     */
+    public void setLastImageDirectory(String lastImageDirectory) {
+        this.lastImageDirectory = lastImageDirectory;
+    }
+
+    /**
      * @return the minSizeFindParticles
      */
     public String getMinSizeFindParticles() {
@@ -316,8 +330,6 @@ public class Config {
     }
 //</editor-fold>
 
-
-
     private Properties properties = new Properties();
     private String propertiesFileName = "durum.xml";
 
@@ -339,6 +351,8 @@ public class Config {
     private String KernelMaxSize = "KernelMaxSize";
     private String KernelMinCirc = "KernelMinCirc";
     private String KernelMaxCirc = "KernelMaxCirc";
+    
+    private String LastImageDirectory = "LastInputDirectory";
 
     public static void main(String[] args) {  // quick and dirty instead of using junit
         String dirS = System.getProperty("user.home");
@@ -375,6 +389,8 @@ public class Config {
     private String minCircChalk = "0.22";
     private String maxCircChalk = "0.98";
     
+    private String lastImageDirectory = System.getProperty("user.home") + "\\Documents";
+    
     public void loadProperties() {
         File localDir = new File(System.getProperty("user.home"), "AppData\\Local\\ARS-SPIERU");
         if (localDir.exists()) {
@@ -402,6 +418,8 @@ public class Config {
                     setMaxCircChalk((String) properties.get(ChalkMaxCirc));
                     setMinSizeChalk((String) properties.get(ChalkMinSize));
                     setMaxSizeChalk((String) properties.get(ChalkMaxSize));
+                    
+                    setLastImageDirectory((String) properties.getProperty(LastImageDirectory));
 
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Config.class.getName()).log(Level.SEVERE, null, ex);
@@ -433,6 +451,8 @@ public class Config {
         properties.setProperty(ChalkMaxSize, getMaxSizeChalk());
         properties.setProperty(ChalkMinCirc, getMinCircChalk());
         properties.setProperty(ChalkMaxCirc, getMaxCircChalk());
+        
+        properties.setProperty(LastImageDirectory, getLastImageDirectory());
         
         File localDir = new File(System.getProperty("user.home"), "AppData\\Local\\ARS-SPIERU");
         if (!localDir.exists()) {

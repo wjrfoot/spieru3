@@ -12,12 +12,10 @@ import ij.measure.ResultsTable;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -31,7 +29,6 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.text.DecimalFormat;
 import javax.swing.WindowConstants;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -300,13 +297,18 @@ public class AnalyzeScan {
 
         ImagePlus imp = baseImagePlus.duplicate();
 
+        int[] dims = imp.getDimensions();
+        
+        
         IJ.run(imp, "Gaussian Blur...", "sigma=3");
         IJ.run(imp, "Convert to Mask", "");
-        imp = imp.resize(842, 1310, "bilinear");
+//        imp = imp.resize(842, 1310, "bilinear");
+        imp = imp.resize(dims[0]/2, dims[1]/2, "bilinear");
         IJ.run(imp, "Convert to Mask", "");
         IJ.run(imp, "Fill Holes", "");
+//        imp = imp.resize(1684, 2620, "bilinear");
+        imp = imp.resize(dims[0], dims[1], "bilinear");
         IJ.run(imp, "Watershed", "");
-        imp = imp.resize(1684, 2620, "bilinear");
         IJ.run(imp, "Convert to Mask", "");
 
         RoiManager roiManager = new RoiManager(false);

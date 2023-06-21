@@ -654,7 +654,13 @@ public class DurumDialog extends javax.swing.JDialog {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setFileHidingEnabled(false);
         fileChooser.setMultiSelectionEnabled(false);
-        File dirF = new File(System.getProperty("user.dir"), "images");
+        
+        Config fileConfig = new Config();
+        fileConfig.loadProperties();
+//        File dirF = new File(System.getProperty("user.dir"), "images");
+//        fileChooser.setCurrentDirectory(dirF);
+        String dir = fileConfig.getLastImageDirectory();
+        File dirF = new File(fileConfig.getLastImageDirectory());
         fileChooser.setCurrentDirectory(dirF);
 //        fileChooser.setCurrentDirectory(new File(lastInputDirectory));
         fileChooser.setFileFilter(new FileFilter() {
@@ -678,6 +684,9 @@ public class DurumDialog extends javax.swing.JDialog {
             inputFile = fileChooser.getSelectedFile();
             jBRun.setEnabled(true);
             setTitle(durumDialogTitle + " - " + inputFile.getName());
+            fileConfig.setLastImageDirectory(inputFile.getParent());
+            fileConfig.saveProperties();
+            config.setLastImageDirectory(inputFile.getParent());
         }
         
 //        try {
