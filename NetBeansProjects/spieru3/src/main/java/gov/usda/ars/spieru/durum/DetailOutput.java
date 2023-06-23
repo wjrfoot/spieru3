@@ -11,7 +11,6 @@ package gov.usda.ars.spieru.durum;
 public class DetailOutput {
 
     //<editor-fold defaultstate="collapsed" desc="getters/setters">
-    
     /**
      * @return the fileName
      */
@@ -54,9 +53,35 @@ public class DetailOutput {
         this.chalkArea = chalkArea;
     }
 //</editor-fold>
-    
+
     private double kernelArea = 0;
     private double chalkArea = 0;
     private String fileName = "";
+
+    public double getFraction() {
+        try {
+            return chalkArea / kernelArea;
+        } catch (Exception ex) {
+            return Double.NaN;
+        }
+    }
+
+    public int getBucket(Config config) {
+        double[] buckets = config.getBucketBounds(0);
+        double fraction = getFraction();
+        for (int idx = 0; idx < buckets.length; idx++) {
+            if (fraction < buckets[idx]) {
+                return idx;
+            }
+        }
+        return buckets.length;
+    }
     
+    public String getBucketLabel(Config config) {
+        try {            
+            return config.getBucketLabels(0)[getBucket(config)];
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            return "err";
+        }
+    }
 }

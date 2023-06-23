@@ -83,6 +83,11 @@ public class DurumDialog extends javax.swing.JDialog {
         jLabel23 = new javax.swing.JLabel();
         jTFChalkmaxCirc = new javax.swing.JTextField();
         jLabel24 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jTFBucketBounds = new javax.swing.JTextField();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jTFBucketLabels = new javax.swing.JTextField();
         jPOutput = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTFOutputFileName = new javax.swing.JTextField();
@@ -361,7 +366,7 @@ public class DurumDialog extends javax.swing.JDialog {
                         .addComponent(jLabel16)
                         .addGap(18, 18, 18)
                         .addComponent(jTFKernelmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(101, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPBaseAnalysisLayout.setVerticalGroup(
             jPBaseAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -494,66 +499,131 @@ public class DurumDialog extends javax.swing.JDialog {
 
         jLabel24.setText("Max Circ");
 
+        jLabel4.setText("Bounds");
+
+        jTFBucketBounds.setText("jTextField1");
+        jTFBucketBounds.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTFFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTFBucketBoundsFocusLost(evt);
+            }
+        });
+        jTFBucketBounds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTFBucketBoundsActionPerformed(evt);
+            }
+        });
+
+        jLabel25.setText("Output Buckets");
+
+        jLabel26.setText("Labels");
+
+        jTFBucketLabels.setText("jTextField2");
+        jTFBucketLabels.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTFFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTFBucketLabelsFocusLost(evt);
+            }
+        });
+        jTFBucketLabels.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTFBucketLabelsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPChalkAnalysisLayout = new javax.swing.GroupLayout(jPChalkAnalysis);
         jPChalkAnalysis.setLayout(jPChalkAnalysisLayout);
         jPChalkAnalysisLayout.setHorizontalGroup(
             jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
-                        .addComponent(jLabel18)
+                .addContainerGap()
+                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPChalkAnalysisLayout.createSequentialGroup()
+                        .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel18)
+                            .addComponent(jLabel25))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel21)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTFChalkminSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
+                                .addComponent(jLabel21)
+                                .addGap(18, 18, 18)
+                                .addComponent(jTFChalkminSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(18, 18, 18)
+                                .addComponent(jTFBucketBounds, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
                         .addComponent(jLabel17)
                         .addGap(71, 71, 71)
                         .addComponent(jLabel19)
                         .addGap(18, 18, 18)
                         .addComponent(jTFChalklowThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(26, 26, 26)
-                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel26)
                     .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
-                        .addComponent(jLabel20)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTFChalkhighThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPChalkAnalysisLayout.createSequentialGroup()
+                                .addComponent(jLabel22)
+                                .addGap(18, 18, 18))
+                            .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
+                                .addComponent(jLabel20)
+                                .addGap(39, 39, 39)))
+                        .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTFChalkhighThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
+                                .addComponent(jTFChalkmaxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel23)))))
+                .addGap(18, 18, 18)
+                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
-                        .addComponent(jLabel22)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTFChalkmaxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel23)
-                        .addGap(18, 18, 18)
                         .addComponent(jTFChalkminCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel24)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTFChalkmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jLabel24))
+                    .addComponent(jTFBucketLabels))
+                .addGap(18, 18, 18)
+                .addComponent(jTFChalkmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPChalkAnalysisLayout.setVerticalGroup(
             jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPChalkAnalysisLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel17)
                     .addComponent(jLabel19)
                     .addComponent(jTFChalklowThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel20)
-                    .addComponent(jTFChalkhighThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTFChalkhighThres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel20))
                 .addGap(18, 18, 18)
-                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel18)
-                    .addComponent(jLabel21)
-                    .addComponent(jTFChalkminSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel22)
-                    .addComponent(jTFChalkmaxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel23)
-                    .addComponent(jTFChalkminCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel24)
-                    .addComponent(jTFChalkmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel18)
+                        .addComponent(jLabel21)
+                        .addComponent(jLabel22)
+                        .addComponent(jTFChalkmaxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel23)
+                        .addComponent(jTFChalkminCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel24)
+                        .addComponent(jTFChalkmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTFChalkminSize, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
+                        .addGap(11, 11, 11)
+                        .addGroup(jPChalkAnalysisLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(jTFBucketBounds, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel25)
+                            .addComponent(jLabel26)))
+                    .addGroup(jPChalkAnalysisLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTFBucketLabels, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
 
         jPOutput.setBorder(javax.swing.BorderFactory.createTitledBorder("Output"));
@@ -600,7 +670,7 @@ public class DurumDialog extends javax.swing.JDialog {
                 .addComponent(jTFOutputDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jBSelectOutputDirectory)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         jPOutputLayout.setVerticalGroup(
             jPOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -669,7 +739,7 @@ public class DurumDialog extends javax.swing.JDialog {
                 .addGroup(jPButtonsLayout.createSequentialGroup()
                     .addGap(52, 52, 52)
                     .addComponent(jBLoad)
-                    .addContainerGap(659, Short.MAX_VALUE)))
+                    .addContainerGap(585, Short.MAX_VALUE)))
         );
         jPButtonsLayout.setVerticalGroup(
             jPButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -694,11 +764,11 @@ public class DurumDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPBaseAnalysis, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPFindParticles, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPFindParticles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPBaseAnalysis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPOutput, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPChalkAnalysis, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPOutput, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -711,9 +781,9 @@ public class DurumDialog extends javax.swing.JDialog {
                 .addComponent(jPBaseAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPChalkAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addComponent(jPOutput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -916,54 +986,6 @@ public class DurumDialog extends javax.swing.JDialog {
         config.setMaxCircKernel(((JTextField) evt.getSource()).getText());
     }//GEN-LAST:event_jTFKernelmaxCircFocusLost
 
-    private void jTFChalklowThresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalklowThresActionPerformed
-        config.setLowThresholdChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalklowThresActionPerformed
-
-    private void jTFChalklowThresFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalklowThresFocusLost
-        config.setLowThresholdChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalklowThresFocusLost
-
-    private void jTFChalkhighThresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkhighThresActionPerformed
-        config.setHiThresholdChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkhighThresActionPerformed
-
-    private void jTFChalkhighThresFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkhighThresFocusLost
-        config.setHiThresholdChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkhighThresFocusLost
-
-    private void jTFChalkminSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkminSizeActionPerformed
-        config.setMinSizeChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkminSizeActionPerformed
-
-    private void jTFChalkminSizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkminSizeFocusLost
-        config.setMinSizeChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkminSizeFocusLost
-
-    private void jTFChalkmaxSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkmaxSizeActionPerformed
-        config.setMaxSizeChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkmaxSizeActionPerformed
-
-    private void jTFChalkmaxSizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkmaxSizeFocusLost
-        config.setMaxSizeChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkmaxSizeFocusLost
-
-    private void jTFChalkminCircActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkminCircActionPerformed
-        config.setMinCircChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkminCircActionPerformed
-
-    private void jTFChalkminCircFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkminCircFocusLost
-        config.setMinCircChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkminCircFocusLost
-
-    private void jTFChalkmaxCircActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkmaxCircActionPerformed
-        config.setMaxCircChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkmaxCircActionPerformed
-
-    private void jTFChalkmaxCircFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkmaxCircFocusLost
-        config.setMaxCircChalk(((JTextField) evt.getSource()).getText());
-    }//GEN-LAST:event_jTFChalkmaxCircFocusLost
-
     private void jTFFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFFocusGained
         JTextField jtf = (JTextField) evt.getSource();
         jtf.selectAll();
@@ -984,6 +1006,70 @@ public class DurumDialog extends javax.swing.JDialog {
         fileConfig.setOutputFileName(((JTextField) evt.getSource()).getText());
         fileConfig.saveProperties();
     }//GEN-LAST:event_jTFOutputFileNameFocusLost
+
+    private void jTFChalkmaxCircActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkmaxCircActionPerformed
+        config.setMaxCircChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkmaxCircActionPerformed
+
+    private void jTFChalkmaxCircFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkmaxCircFocusLost
+        config.setMaxCircChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkmaxCircFocusLost
+
+    private void jTFChalkminCircActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkminCircActionPerformed
+        config.setMinCircChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkminCircActionPerformed
+
+    private void jTFChalkminCircFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkminCircFocusLost
+        config.setMinCircChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkminCircFocusLost
+
+    private void jTFChalkmaxSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkmaxSizeActionPerformed
+        config.setMaxSizeChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkmaxSizeActionPerformed
+
+    private void jTFChalkmaxSizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkmaxSizeFocusLost
+        config.setMaxSizeChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkmaxSizeFocusLost
+
+    private void jTFChalkminSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkminSizeActionPerformed
+        config.setMinSizeChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkminSizeActionPerformed
+
+    private void jTFChalkminSizeFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkminSizeFocusLost
+        config.setMinSizeChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkminSizeFocusLost
+
+    private void jTFChalkhighThresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalkhighThresActionPerformed
+        config.setHiThresholdChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkhighThresActionPerformed
+
+    private void jTFChalkhighThresFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalkhighThresFocusLost
+        config.setHiThresholdChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalkhighThresFocusLost
+
+    private void jTFChalklowThresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFChalklowThresActionPerformed
+        config.setLowThresholdChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalklowThresActionPerformed
+
+    private void jTFChalklowThresFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFChalklowThresFocusLost
+        config.setLowThresholdChalk(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFChalklowThresFocusLost
+
+    private void jTFBucketBoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFBucketBoundsActionPerformed
+        config.setBucketBounds(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFBucketBoundsActionPerformed
+
+    private void jTFBucketBoundsFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFBucketBoundsFocusLost
+        config.setBucketBounds(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFBucketBoundsFocusLost
+
+    private void jTFBucketLabelsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFBucketLabelsActionPerformed
+        config.setBucketLabels(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFBucketLabelsActionPerformed
+
+    private void jTFBucketLabelsFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFBucketLabelsFocusLost
+        config.setBucketLabels(((JTextField) evt.getSource()).getText());
+    }//GEN-LAST:event_jTFBucketLabelsFocusLost
 
 //</editor-fold>
     private void loadConfig() {
@@ -1008,6 +1094,9 @@ public class DurumDialog extends javax.swing.JDialog {
         jTFChalkminCirc.setText(config.getMinCircChalk());
         jTFChalkminSize.setText(config.getMinSizeChalk());
 
+        jTFBucketBounds.setText(config.getBucketBounds());
+        jTFBucketLabels.setText(config.getBucketLabels());
+              
         jTFOutputFileName.setText(config.getOutputFileName());
         jTFOutputDirectory.setText(config.getOutputDirectory());
     }
@@ -1081,7 +1170,10 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
@@ -1092,6 +1184,8 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPChalkAnalysis;
     private javax.swing.JPanel jPFindParticles;
     private javax.swing.JPanel jPOutput;
+    private javax.swing.JTextField jTFBucketBounds;
+    private javax.swing.JTextField jTFBucketLabels;
     private javax.swing.JTextField jTFChalkhighThres;
     private javax.swing.JTextField jTFChalklowThres;
     private javax.swing.JTextField jTFChalkmaxCirc;

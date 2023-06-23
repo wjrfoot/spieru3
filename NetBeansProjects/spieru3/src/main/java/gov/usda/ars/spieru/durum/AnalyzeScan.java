@@ -88,6 +88,8 @@ public class AnalyzeScan {
         System.out.println("filename " + dirF.getAbsolutePath() + " " + dirF.exists());
         setFileName(dirF.getAbsolutePath());
         setConfig(new Config());
+        buckets = getConfig().getBucketBounds(0);
+        xLabels = getConfig().getBucketLabels(0);
 //        setFileName(FindLastPictureFile.getLastFileName());
     }
 
@@ -99,6 +101,8 @@ public class AnalyzeScan {
     public AnalyzeScan(String fileName, Config config) {
         setFileName(fileName);
         setConfig(config);
+        buckets = getConfig().getBucketBounds(0);
+        xLabels = getConfig().getBucketLabels(0);
     }
 
     /**
@@ -196,7 +200,7 @@ public class AnalyzeScan {
 
         SummaryOutput summaryOutput = calcSummaryInfo(detailOutputList);
 
-        Spreadsheet spreadsheet = new Spreadsheet();
+        Spreadsheet spreadsheet = new Spreadsheet(config);
 
         spreadsheet.openXLS();
 

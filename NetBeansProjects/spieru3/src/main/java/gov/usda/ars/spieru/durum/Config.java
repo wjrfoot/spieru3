@@ -28,6 +28,50 @@ public class Config {
     //<editor-fold defaultstate="collapsed" desc="getters/setters">
     
     /**
+     * @return the bucketBounds
+     */
+    public String getBucketBounds() {
+        return bucketBounds;
+    }
+    
+    public double[] getBucketBounds(int arg) {
+        double[] bounds = null;
+        String[] parsedBounds = getBucketBounds().split(",");
+        bounds = new double[parsedBounds.length];
+        for (int idx = 0; idx < parsedBounds.length; idx++) {
+            bounds[idx] = Double.parseDouble(parsedBounds[idx].trim());
+        }
+        return bounds;
+    }
+
+    /**
+     * @param bucketBounds the bucketBounds to set
+     */
+    public void setBucketBounds(String bucketBounds) {
+        this.bucketBounds = bucketBounds;
+    }
+
+    /**
+     * @return the bucketLabels
+     */
+    public String getBucketLabels() {
+        return bucketLabels;
+    }
+
+    public String[] getBucketLabels(int arg) {
+        String buckets[] = null;
+        buckets = getBucketLabels().split(", ");
+        return buckets;
+    }
+
+    /**
+     * @param bucketLabels the bucketLabels to set
+     */
+    public void setBucketLabels(String bucketLabels) {
+        this.bucketLabels = bucketLabels;
+    }
+
+    /**
      * @return the outputFileName
      */
     public String getOutputFileName() {
@@ -380,6 +424,9 @@ public class Config {
     private String KernelMinCirc = "KernelMinCirc";
     private String KernelMaxCirc = "KernelMaxCirc";
     
+    private String BucketBounds = "BucketBounds";
+    private String BucketLabels = "BucketLabels";
+
     private String LastImageDirectory = "LastInputDirectory";
     private String OutputFileName = "OutputFileName";
     private String OutputDirectory = "OutputDirectory";
@@ -393,13 +440,8 @@ public class Config {
         System.out.println(localDir.getPath() + " " + localDir.exists());
         Config config = new Config();
         config.saveProperties();
-
     }
 
-//    private int lowThreshold1 = 80;      // pass 1 analyze particles threshold 
-//    private int hiThreshold1 = 255;
-//    private int lowThreshold2 = 185;     // pass 2 analyze particles threshold 
-//    private int hiThreshold2 = 255;
     private String minSizeFindParticles = "1000";
     private String maxSizeFindParticles = "10000";
     private String minCircFindParticles = "0.2";
@@ -418,6 +460,9 @@ public class Config {
     private String maxSizeChalk = "13000";
     private String minCircChalk = "0.22";
     private String maxCircChalk = "0.98";
+    
+    private String bucketBounds = "0.1,0.2,0.5,10.";
+    private String bucketLabels = "Min, Lo, Med, Hi";
     
     private String lastImageDirectory = System.getProperty("user.home") + "\\Documents";
     private String outputFileName = "dumum";
@@ -451,6 +496,9 @@ public class Config {
                     setMinSizeChalk((String) properties.get(ChalkMinSize));
                     setMaxSizeChalk((String) properties.get(ChalkMaxSize));
                     
+                    setBucketBounds((String) properties.getProperty(BucketBounds));
+                    setBucketLabels((String) properties.getProperty(BucketLabels));
+
                     setLastImageDirectory((String) properties.getProperty(LastImageDirectory));
                     setOutputFileName((String) properties.getProperty(OutputFileName));
                     setOutputDirectory((String) properties.getProperty(OutputDirectory));
@@ -485,6 +533,9 @@ public class Config {
         properties.setProperty(ChalkMaxSize, getMaxSizeChalk());
         properties.setProperty(ChalkMinCirc, getMinCircChalk());
         properties.setProperty(ChalkMaxCirc, getMaxCircChalk());
+
+        properties.setProperty(BucketBounds, getBucketBounds());
+        properties.setProperty(BucketLabels, getBucketLabels());
         
         properties.setProperty(LastImageDirectory, getLastImageDirectory());
         properties.setProperty(OutputFileName, getOutputFileName());

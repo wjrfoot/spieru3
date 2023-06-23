@@ -54,6 +54,8 @@ public class Spreadsheet {
     private String side;
     private XSSFWorkbook workbook = null;
 
+    private Config config = null;
+
     public static void main(String[] args) {
 
         Spreadsheet spreadsheet = new Spreadsheet();
@@ -63,6 +65,14 @@ public class Spreadsheet {
         spreadsheet.writeXLSFile();
 
         System.exit(0);
+    }
+
+    public Spreadsheet() {
+        this(new Config());
+    }
+
+    public Spreadsheet(Config config) {
+        this.config = config;
     }
 
     private XSSFWorkbook initNewWorkbook() {
@@ -80,8 +90,8 @@ public class Spreadsheet {
      */
     public XSSFWorkbook openXLS() {
 
-        Config config = new Config();
-        config.loadProperties();
+//        Config config = new Config();
+//        config.loadProperties();
         setFileDir(config.getOutputDirectory());
         setFileName(config.getOutputFileName() + ".xlsx");
         File parent = new File(getFileDir());
@@ -184,13 +194,14 @@ public class Spreadsheet {
         String inputFileName = summaryOutput.getSampleFileName();
         XSSFSheet sheet = getSheet(inputFileName);
         addSummaryLine(sheet, summaryOutput);
+        addBucketSummary(sheet, detailOutputList);
         addDetailTitles(sheet);
         addDetailLines(sheet, detailOutputList);
     }
 
     void addDetailTitles(XSSFSheet sheet) {
 
-        String[] items = {"#", "Kernel", "Chalk"};
+        String[] items = {"#", "Kernel", "Chalk", "%"};
         int rowNum = sheet.getLastRowNum() + 2;
         XSSFRow row = sheet.createRow(rowNum);
 
@@ -204,13 +215,36 @@ public class Spreadsheet {
 
     }
 
+    void addBucketSummary(XSSFSheet sheet, List<DetailOutput> detailOutputList) {
+
+        String[] bucketLabels = config.getBucketLabels(0);
+        int[] counts = new int[bucketLabels.length];
+
+        for (DetailOutput detailOutput : detailOutputList) {
+            counts[detailOutput.getBucket(config)]++;
+        }
+
+        int rowNum = sheet.getLastRowNum() + 2;
+
+        XSSFRow rowLabels = sheet.createRow(rowNum++);
+        XSSFRow rowValues = sheet.createRow(rowNum++);
+
+        for (int idx = 0; idx < bucketLabels.length; idx++) {
+            Cell cell = rowLabels.createCell(idx);
+            cell.setCellValue(bucketLabels[idx]);
+            cell = rowValues.createCell(idx);
+            cell.setCellValue(counts[idx]);
+        }
+
+    }
+
     void addDetailLines(XSSFSheet sheet, List<DetailOutput> detailOutputList) {
 
         int rowNum = sheet.getLastRowNum() + 2;
         int rowID = 1;
 
         for (DetailOutput detailOutput : detailOutputList) {
-            
+
             int cellid = 0;
             XSSFRow row = sheet.createRow(rowNum++);
             Cell cell = row.createCell(cellid++);
@@ -220,50 +254,25 @@ public class Spreadsheet {
             cell = row.createCell(cellid++);
             cell.setCellValue(detailOutput.getChalkArea());
 
+            CellStyle style = workbook.createCellStyle();
+//        style.setAlignment(HorizontalAlignment.CENTER);
+//        style.setVerticalAlignment(VerticalAlignment.CENTER);
+//        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+//        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            style.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
+
+            cell = row.createCell(cellid++);
+            cell.setCellStyle(style);
+            cell.setCellValue(detailOutput.getFraction());
+
+            cell = row.createCell(cellid++);
+            cell.setCellValue(detailOutput.getBucketLabel(config));
+
 //                cell.setCellValue((String) obj);
         }
 
     }
 
-//    static void process(String inputDirName) {
-//        whoAmI(">>");
-//        System.out.println(inputDirName);
-//        File dirF = new File(System.getProperty("user.home"), "AppData\\Local\\ARS-SPIERU\\Flour\\images");
-//
-//        File[] files = dirF.listFiles(new FileFilter() {
-//            @Override
-//            public boolean accept(File file) {
-//                String fileName = file.getAbsolutePath();
-//                return fileName.toLowerCase().endsWith("tif")
-//                        || fileName.toLowerCase().endsWith("bmp")
-//                        || fileName.toLowerCase().endsWith("png");
-//            }
-//        });
-//
-//        List<Spreadsheet> results = processFiles(files);
-//        System.out.println("length of results " + results.size());
-//
-//        PrintWriter printWriter = new PrintWriter(System.out);
-//        writeSummaryHeader(printWriter);
-//        String lastSampleID = "";
-//        for (Spreadsheet resultsRecord : results) {
-//            resultsRecord.writeSummaryLine(printWriter, lastSampleID);
-//            lastSampleID = resultsRecord.getSampleID().trim();
-//        }
-//        printWriter.close();
-//
-//        Config config = Config.loadConfig("smut");
-//        String outputDirectory = config.getOutputDirectory();
-//
-//        String outputFileName = new File(System.getProperty("user.home"), "Documents\\SPIERU\\FLOUR.xlsx").getAbsolutePath();
-//        System.err.println(outputFileName);
-//        // todo make sure name length is less than 32
-//        String sheetName = new File(config.getLastInputDirectory()).getName().substring(10) + "-" + config.getHiThreshold();
-//        System.err.println(sheetName + " " + sheetName.length());
-//        writeXLS(results, outputFileName, sheetName);
-////        writeXLS(results, new File(outputDirectory).getAbsolutePath(),
-////                new File(config.getLastInputDirectory()).getName() + "-" + config.getHiThreshold());
-//    }
     public static void writeSummaryHeader(PrintWriter printWriter) {
         printWriter.printf("  Sample   Rot  S ParCnt  PixCnt %%Area  LMean   LStd   AMean  AStd   BMean  BStd\n");
     }
