@@ -204,7 +204,9 @@ public class AnalyzeScan {
 
         spreadsheet.openXLS();
 
-        spreadsheet.addSummaryLine(summaryOutput);
+        spreadsheet.addSampleLogLine(summaryOutput);
+
+        spreadsheet.addDataSummaryLine(summaryOutput, detailOutputList);
 
         spreadsheet.addDetailLines(summaryOutput, detailOutputList);
 

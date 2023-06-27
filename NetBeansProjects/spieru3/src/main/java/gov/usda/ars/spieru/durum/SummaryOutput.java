@@ -160,7 +160,7 @@ public class SummaryOutput {
           Date date = Calendar.getInstance().getTime();
 
         // Display a date in day, month, year format
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy, hh:mm:ss");
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yy-hh:mm");
         String today = formatter.format(date);
         setDateStr(today);
 

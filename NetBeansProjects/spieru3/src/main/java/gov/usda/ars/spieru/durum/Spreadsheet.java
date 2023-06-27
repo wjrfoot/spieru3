@@ -43,6 +43,8 @@ public class Spreadsheet {
 
     private String fileName = "durum.xlsx";
     private String fileDir = System.getProperty("user.home") + "\\Documents\\USDA-ARS-SPIERU";
+    private static final String SummarySheetName = "sample log";
+    private static final String DataSummarySheetName = "data summary";
 
     private ResultsTable labTable;
     private ResultsTable analyzeParticle;
@@ -77,8 +79,10 @@ public class Spreadsheet {
 
     private XSSFWorkbook initNewWorkbook() {
         workbook = new XSSFWorkbook();
-        XSSFSheet sheet = getSheet("summary");
+        XSSFSheet sheet = getSheet(SummarySheetName);
         addSummaryTitles(sheet);
+        sheet = getSheet(DataSummarySheetName);
+        addDataLogTitles(sheet);
         return workbook;
     }
 
@@ -116,7 +120,7 @@ public class Spreadsheet {
             } catch (InvalidFormatException ex) {
                 Logger.getLogger(Spreadsheet.class.getName()).log(Level.SEVERE, null, ex);
             }
-            XSSFSheet sheet = getSheet("summary");
+            XSSFSheet sheet = getSheet(SummarySheetName);
             InputStream is = null;
             try {
 
@@ -141,7 +145,7 @@ public class Spreadsheet {
 
     void addSummaryTitles(XSSFSheet sheet) {
 
-        String[] items = {"Sample", "Count", "Chalk", "Kernel", "Lo Chalk", "Hi Chalk", "Lo Kernel", "hi Kernel", "DateTime"};
+        String[] items = {"Sample", "Date Time  ", "Count", "Chalk", "Kernel", "Lo Chalk", "Hi Chalk", "Lo Kernel", "hi Kernel"};
         XSSFRow row = sheet.createRow(1);
 
         int cellid = 0;
@@ -151,16 +155,60 @@ public class Spreadsheet {
             cell.setCellValue((String) obj);
 //                cell.setCellValue((String) obj);
         }
+        String[] boundLabels = config.getBucketLabels(0);
+        for (String obj : boundLabels) {
+            Cell cell = row.createCell(cellid++);
+            cell.setCellValue((String) obj);
+//                cell.setCellValue((String) obj);
+        }
 
     }
 
-    void addSummaryLine(SummaryOutput summaryOutput) {
-        XSSFSheet sheet = getSheet("summary");
-        addSummaryLine(sheet, summaryOutput);
+    void addDataLogTitles(XSSFSheet sheet) {
+
+        String[] items = {"Sample", "Date Time  "};
+        XSSFRow row = sheet.createRow(1);
+
+        int cellid = 0;
+
+        for (String obj : items) {
+            Cell cell = row.createCell(cellid++);
+            cell.setCellValue((String) obj);
+//                cell.setCellValue((String) obj);
+        }
+        String[] boundLabels = config.getBucketLabels(0);
+        CellStyle style = workbook.createCellStyle();
+        style.setAlignment(HorizontalAlignment.CENTER);
+
+        cellid++;
+        Cell cell = null;
+        for (String str : boundLabels) {
+            cell = row.createCell(cellid++);
+            cell.setCellStyle(style);
+            cell.setCellValue((String) str);
+        }
+        cell = row.createCell(cellid++);
+        cell.setCellStyle(style);
+        cell.setCellValue("Total");
+
+        cellid++;
+        for (String str : boundLabels) {
+            cell = row.createCell(cellid++);
+            cell.setCellStyle(style);
+            cell.setCellValue("%" + str);
+        }
 
     }
 
-    void addSummaryLine(XSSFSheet sheet, SummaryOutput summaryOutput) {
+    void addSampleLogLine(SummaryOutput summaryOutput) {
+        XSSFSheet sheet = getSheet(SummarySheetName);
+//        sheet.setColumnWidth(1, 50);  // make wide enough for data string
+        addSampleLogLine(sheet, summaryOutput);
+//        sheet.setColumnWidth(1, 50);  // make wide enough for data string
+
+    }
+
+    void addSampleLogLine(XSSFSheet sheet, SummaryOutput summaryOutput) {
 
         int lastRowNum = sheet.getLastRowNum();
         XSSFRow row = sheet.createRow(lastRowNum + 1);
@@ -169,6 +217,8 @@ public class Spreadsheet {
 
         Cell cell = row.createCell(cellid++);
         cell.setCellValue(summaryOutput.getSampleFileName());
+        cell = row.createCell(cellid++);
+        cell.setCellValue(summaryOutput.getDateStr());
         cell = row.createCell(cellid++);
         cell.setCellValue(summaryOutput.getCount());
         cell = row.createCell(cellid++);
@@ -183,9 +233,68 @@ public class Spreadsheet {
         cell.setCellValue(summaryOutput.getKernelLoThreshold());
         cell = row.createCell(cellid++);
         cell.setCellValue(summaryOutput.getKernelHiThreshold());
+//                cell.setCellValue((String) obj);
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
+        double[] bounds = config.getBucketBounds(0);
+        for (double bound : bounds) {
+            cell = row.createCell(cellid++);
+            cell.setCellStyle(style);
+            cell.setCellValue(bound);
+
+        }
+
+    }
+
+    void addDataSummaryLine(SummaryOutput summaryOutput, List<DetailOutput> detailOutputList) {
+        XSSFSheet sheet = getSheet(DataSummarySheetName);
+//        sheet.setColumnWidth(1, 50);  // make wide enough for data string
+        addDataSummaryLine(sheet, summaryOutput, detailOutputList);
+//        sheet.setColumnWidth(1, 50);  // make wide enough for data string
+
+    }
+
+    void addDataSummaryLine(XSSFSheet sheet, SummaryOutput summaryOutput, List<DetailOutput> detailOutputList) {
+
+        int lastRowNum = sheet.getLastRowNum();
+        XSSFRow row = sheet.createRow(lastRowNum + 1);
+
+        String[] bucketLabels = config.getBucketLabels(0);
+        int[] counts = new int[bucketLabels.length];
+
+        for (DetailOutput detailOutput : detailOutputList) {
+            counts[detailOutput.getBucket(config)]++;
+        }
+
+        int cellid = 0;
+
+        Cell cell = row.createCell(cellid++);
+        cell.setCellValue(summaryOutput.getSampleFileName());
         cell = row.createCell(cellid++);
         cell.setCellValue(summaryOutput.getDateStr());
-//                cell.setCellValue((String) obj);
+        cell = row.createCell(cellid++);
+
+        int total = 0;
+        for (int count : counts) {
+            total += count;
+        }
+
+        for (int count : counts) {
+            cell = row.createCell(cellid++);
+            cell.setCellValue(count);
+        }
+            cell = row.createCell(cellid++);
+            cell.setCellValue(total);
+
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
+        cellid++; // put space between counts and percents
+        for (int count : counts) {
+            cell = row.createCell(cellid++);
+            cell.setCellStyle(style);
+            cell.setCellValue(100. * count / total);
+
+        }
 
     }
 
@@ -193,7 +302,8 @@ public class Spreadsheet {
 
         String inputFileName = summaryOutput.getSampleFileName();
         XSSFSheet sheet = getSheet(inputFileName);
-        addSummaryLine(sheet, summaryOutput);
+//        sheet.setColumnWidth(1, 500);  // make wide enough for data string
+        addSampleLogLine(sheet, summaryOutput);
         addBucketSummary(sheet, detailOutputList);
         addDetailTitles(sheet);
         addDetailLines(sheet, detailOutputList);
@@ -201,11 +311,11 @@ public class Spreadsheet {
 
     void addDetailTitles(XSSFSheet sheet) {
 
-        String[] items = {"#", "Kernel", "Chalk", "%"};
+        String[] items = {"#", "Kernel", "Chalk", "%", "Type"};
         int rowNum = sheet.getLastRowNum() + 2;
         XSSFRow row = sheet.createRow(rowNum);
 
-        int cellid = 0;
+        int cellid = 2;
 
         for (String obj : items) {
             Cell cell = row.createCell(cellid++);
@@ -224,17 +334,40 @@ public class Spreadsheet {
             counts[detailOutput.getBucket(config)]++;
         }
 
+        int total = 0;
+        for (int count : counts) {
+            total += count;
+        }
+
         int rowNum = sheet.getLastRowNum() + 2;
 
         XSSFRow rowLabels = sheet.createRow(rowNum++);
         XSSFRow rowValues = sheet.createRow(rowNum++);
 
+        CellStyle style = workbook.createCellStyle();
+        style.setDataFormat(workbook.createDataFormat().getFormat("###.%"));
+
         for (int idx = 0; idx < bucketLabels.length; idx++) {
-            Cell cell = rowLabels.createCell(idx);
+            Cell cell = rowLabels.createCell(idx + 2);
             cell.setCellValue(bucketLabels[idx]);
-            cell = rowValues.createCell(idx);
+            cell = rowValues.createCell(idx + 2);
             cell.setCellValue(counts[idx]);
+            cell = rowLabels.createCell(idx + 8);
+            cell.setCellValue(bucketLabels[idx]);
+            cell = rowValues.createCell(idx + 8);
+            cell.setCellStyle(style);
+            cell.setCellValue(counts[idx] * 1.0 / total);
         }
+
+        Cell cell = rowLabels.createCell(counts.length + 2);
+        cell.setCellValue("Total");
+        cell = rowValues.createCell(counts.length + 2);
+        cell.setCellValue(total);
+        cell = rowLabels.createCell(counts.length + 8);
+        cell.setCellValue("Total");
+        cell = rowValues.createCell(counts.length + 8);
+        cell.setCellStyle(style);
+        cell.setCellValue(1.0);
 
     }
 
@@ -245,7 +378,7 @@ public class Spreadsheet {
 
         for (DetailOutput detailOutput : detailOutputList) {
 
-            int cellid = 0;
+            int cellid = 2;
             XSSFRow row = sheet.createRow(rowNum++);
             Cell cell = row.createCell(cellid++);
             cell.setCellValue(rowID++);
@@ -265,7 +398,14 @@ public class Spreadsheet {
             cell.setCellStyle(style);
             cell.setCellValue(detailOutput.getFraction());
 
+            style = workbook.createCellStyle();
+            style.setAlignment(HorizontalAlignment.CENTER);
+//        style.setVerticalAlignment(VerticalAlignment.CENTER);
+//        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+//        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
             cell = row.createCell(cellid++);
+            cell.setCellStyle(style);
             cell.setCellValue(detailOutput.getBucketLabel(config));
 
 //                cell.setCellValue((String) obj);
@@ -313,71 +453,6 @@ public class Spreadsheet {
         setSide(tokens[3]);
     }
 
-//    private static int writeHeader(int lineNum, Map< String, Object[]> resultsMap,
-//            Map<Integer, Object[]> rMI) {
-//
-//        Config config = Config.loadConfig("smut");
-//
-//        // User
-//        List<Object> line = new ArrayList<>();
-//        line.add("User:");
-//        line.add(config.getUserID());
-//        String lineID = String.format("%5d", lineNum);
-//        String runName = new File(config.getLastInputDirectory()).getName();
-//        line.add("Run:");
-//        line.add(runName);
-//        resultsMap.put(lineID, line.toArray());
-//        rMI.put(lineNum, line.toArray());
-//        lineNum++;
-//
-//        // Threshold
-//        line = new ArrayList<>();
-//        line.add("Low Threshold");
-//        line.add(null);
-//        line.add(config.getLoThreshold(0.0));
-//        line.add("High Threshold");
-//        line.add(null);
-//        line.add(config.getHiThreshold(0.0));
-//        lineID = String.format("%5d", lineNum);
-//        resultsMap.put(lineID, line.toArray());
-//        rMI.put(lineNum, line.toArray());
-//        lineNum++;
-//
-//        // Size
-//        line = new ArrayList<>();
-//        line.add("Min Size");
-//        line.add(null);
-//        line.add(config.getMinSize(0.0));
-//        line.add("Max Size");
-//        line.add(null);
-//        line.add(config.getMaxSize(0.0));
-//        lineID = String.format("%5d", lineNum);
-//        resultsMap.put(lineID, line.toArray());
-//        rMI.put(lineNum, line.toArray());
-//        lineNum++;
-//
-//        // Circularity
-//        line = new ArrayList<>();
-//        line.add("Min Circularity");
-//        line.add(null);
-//        line.add(config.getMinCirc(0.0));
-//        line.add("Max Circularity");
-//        line.add(null);
-//        line.add(config.getMaxCirc(0.0));
-//        lineID = String.format("%5d", lineNum);
-//        resultsMap.put(lineID, line.toArray());
-//        rMI.put(lineNum, line.toArray());
-//        lineNum++;
-//
-//        // Blank line
-//        line = new ArrayList<>();
-//        lineID = String.format("%5d", lineNum);
-//        resultsMap.put(lineID, line.toArray());
-//        rMI.put(lineNum, line.toArray());
-//        lineNum++;
-//
-//        return lineNum;
-//    }
     private XSSFSheet getSheet(String sheetName) {
 
         XSSFSheet sheet = null;
