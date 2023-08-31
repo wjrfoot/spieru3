@@ -308,17 +308,23 @@ public class AnalyzeScan {
         int[] dims = imp.getDimensions();
         
         
-        IJ.run(imp, "Gaussian Blur...", "sigma=3");
-        IJ.run(imp, "Convert to Mask", "");
-//        imp = imp.resize(842, 1310, "bilinear");
-        imp = imp.resize(dims[0]/2, dims[1]/2, "bilinear");
-        IJ.run(imp, "Convert to Mask", "");
-        IJ.run(imp, "Fill Holes", "");
-//        imp = imp.resize(1684, 2620, "bilinear");
-        imp = imp.resize(dims[0], dims[1], "bilinear");
-        IJ.run(imp, "Watershed", "");
-        IJ.run(imp, "Convert to Mask", "");
+//        IJ.run(imp, "Gaussian Blur...", "sigma=3");
+//        IJ.run(imp, "Convert to Mask", "");
+////        imp = imp.resize(842, 1310, "bilinear");
+//        imp = imp.resize(dims[0]/2, dims[1]/2, "bilinear");
+//        IJ.run(imp, "Convert to Mask", "");
+//        IJ.run(imp, "Fill Holes", "");
+////        imp = imp.resize(1684, 2620, "bilinear");
+//        imp = imp.resize(dims[0], dims[1], "bilinear");
+//        IJ.run(imp, "Watershed", "");
+//        IJ.run(imp, "Convert to Mask", "");
 
+
+//        IJ.run(imp, "Convert to Mask", "");
+//IJ.run(imp, "Watershed", "");
+//        Watershed.Watershed(imp);
+//IJ.run(imp, "Analyze Particles...", "size=1000-15000  circularity=0.20-1.00 show=Outlines display exclude clear summarize add");
+        
         RoiManager roiManager = new RoiManager(false);
         ResultsTable resultsTable = new ResultsTable();
 

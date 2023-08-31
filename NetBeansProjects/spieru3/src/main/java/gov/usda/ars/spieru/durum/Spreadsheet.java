@@ -22,8 +22,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipFile;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -114,16 +116,15 @@ public class Spreadsheet {
         } else {
             System.out.println("Appending to existing workbook '" + file + "'");
             try {
+                ZipSecureFile.setMinInflateRatio(0.001); // fixes error (take out and see why)
                 workbook = new XSSFWorkbook(file);
-            } catch (IOException ex) {
-                Logger.getLogger(Spreadsheet.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvalidFormatException ex) {
+            } catch (IOException | InvalidFormatException ex) {
                 Logger.getLogger(Spreadsheet.class.getName()).log(Level.SEVERE, null, ex);
             }
             XSSFSheet sheet = getSheet(SummarySheetName);
             InputStream is = null;
             try {
-
+                ZipSecureFile.setMinInflateRatio(0.001);
                 is = new FileInputStream(file);
                 workbook = new XSSFWorkbook(is);
             } catch (FileNotFoundException ex) {
@@ -263,7 +264,11 @@ public class Spreadsheet {
         int[] counts = new int[bucketLabels.length];
 
         for (DetailOutput detailOutput : detailOutputList) {
+            try {
             counts[detailOutput.getBucket(config)]++;
+            } catch (ArrayIndexOutOfBoundsException aioobe) {
+                
+            }
         }
 
         int cellid = 0;
@@ -331,7 +336,11 @@ public class Spreadsheet {
         int[] counts = new int[bucketLabels.length];
 
         for (DetailOutput detailOutput : detailOutputList) {
+            try {
             counts[detailOutput.getBucket(config)]++;
+            } catch (ArrayIndexOutOfBoundsException aioobe) {
+                System.err.println("array index out of bound " + detailOutput.getBucketLabel(config));
+            }
         }
 
         int total = 0;
