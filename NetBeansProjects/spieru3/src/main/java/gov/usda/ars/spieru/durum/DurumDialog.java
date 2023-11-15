@@ -4,6 +4,8 @@
  */
 package gov.usda.ars.spieru.durum;
 
+import inra.ijpb.binary.distmap.ChamferMask2D;
+import inra.ijpb.binary.distmap.ChamferMasks2D;
 import java.io.File;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
@@ -28,6 +30,7 @@ public class DurumDialog extends javax.swing.JDialog {
     public DurumDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        initWatershedDistances();
         loadConfig();
         durumDialogTitle = this.getTitle();
         Icon icon = UIManager.getIcon("FileView.directoryIcon");
@@ -53,6 +56,14 @@ public class DurumDialog extends javax.swing.JDialog {
         jLabel7 = new javax.swing.JLabel();
         jTFFindParticlesmaxCirc = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
+        jCBWatershed = new javax.swing.JComboBox<>();
+        jLabel27 = new javax.swing.JLabel();
+        jCBDistances = new javax.swing.JComboBox<>();
+        jLabel28 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jTFDynamic = new javax.swing.JTextField();
+        jLabel30 = new javax.swing.JLabel();
+        jCBConnectivity = new javax.swing.JComboBox<>();
         jPBaseAnalysis = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -180,35 +191,108 @@ public class DurumDialog extends javax.swing.JDialog {
 
         jLabel8.setText("Max Circ");
 
+        jCBWatershed.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "None", "Basic", "DTW" }));
+        jCBWatershed.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCBWatershedItemStateChanged(evt);
+            }
+        });
+
+        jLabel27.setText("Distances");
+
+        jCBDistances.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jCBDistances.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCBDistancesItemStateChanged(evt);
+            }
+        });
+
+        jLabel28.setText("Dynamic");
+
+        jLabel29.setText("Watershed");
+
+        jTFDynamic.setText("jTextField1");
+        jTFDynamic.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTFDynamicFocusLost(evt);
+            }
+        });
+        jTFDynamic.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTFDynamicActionPerformed(evt);
+            }
+        });
+
+        jLabel30.setText("Connectivity");
+
+        jCBConnectivity.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "4", "8" }));
+        jCBConnectivity.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jCBConnectivityItemStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPFindParticlesLayout = new javax.swing.GroupLayout(jPFindParticles);
         jPFindParticles.setLayout(jPFindParticlesLayout);
         jPFindParticlesLayout.setHorizontalGroup(
             jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPFindParticlesLayout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addComponent(jLabel2)
+                .addGroup(jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel29))
                 .addGap(18, 18, 18)
-                .addComponent(jLabel5)
+                .addGroup(jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPFindParticlesLayout.createSequentialGroup()
+                        .addComponent(jCBWatershed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel27))
+                    .addGroup(jPFindParticlesLayout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTFFindParticlesminSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addComponent(jTFFindParticlesminSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(26, 26, 26)
-                .addComponent(jLabel6)
+                .addGroup(jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPFindParticlesLayout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTFFindParticlesmaxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jCBDistances, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jTFFindParticlesmaxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPFindParticlesLayout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addGap(27, 27, 27)
+                        .addComponent(jTFFindParticlesminCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPFindParticlesLayout.createSequentialGroup()
+                        .addComponent(jLabel28)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jTFDynamic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
-                .addComponent(jLabel7)
-                .addGap(18, 18, 18)
-                .addComponent(jTFFindParticlesminCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel8)
-                .addGap(18, 18, 18)
-                .addComponent(jTFFindParticlesmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPFindParticlesLayout.createSequentialGroup()
+                        .addComponent(jLabel8)
+                        .addGap(18, 18, 18)
+                        .addComponent(jTFFindParticlesmaxCirc, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPFindParticlesLayout.createSequentialGroup()
+                        .addComponent(jLabel30)
+                        .addGap(18, 18, 18)
+                        .addComponent(jCBConnectivity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPFindParticlesLayout.setVerticalGroup(
             jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPFindParticlesLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCBWatershed, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                    .addComponent(jLabel27)
+                    .addComponent(jCBDistances, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabel29)
+                    .addComponent(jTFDynamic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel30)
+                    .addComponent(jCBConnectivity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPFindParticlesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel5)
@@ -777,13 +861,13 @@ public class DurumDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPFindParticles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPBaseAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPChalkAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jPOutput, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1071,6 +1155,27 @@ public class DurumDialog extends javax.swing.JDialog {
         config.setBucketLabels(((JTextField) evt.getSource()).getText());
     }//GEN-LAST:event_jTFBucketLabelsFocusLost
 
+    private void jCBWatershedItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCBWatershedItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCBWatershedItemStateChanged
+
+    private void jCBDistancesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCBDistancesItemStateChanged
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_jCBDistancesItemStateChanged
+
+    private void jCBConnectivityItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jCBConnectivityItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCBConnectivityItemStateChanged
+
+    private void jTFDynamicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTFDynamicActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTFDynamicActionPerformed
+
+    private void jTFDynamicFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTFDynamicFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTFDynamicFocusLost
+
 //</editor-fold>
     private void loadConfig() {
         config.loadProperties();
@@ -1096,9 +1201,22 @@ public class DurumDialog extends javax.swing.JDialog {
 
         jTFBucketBounds.setText(config.getBucketBounds());
         jTFBucketLabels.setText(config.getBucketLabels());
-              
+
         jTFOutputFileName.setText(config.getOutputFileName());
         jTFOutputDirectory.setText(config.getOutputDirectory());
+    }
+
+    private DTWMParams dtwmParams = new DTWMParams();
+    
+    private void initWatershedDistances() {
+          
+        jCBDistances.removeAllItems();
+          
+          for (String str : inra.ijpb.binary.distmap.ChamferMasks2D.getAllLabels()) {
+              jCBDistances.addItem(str);
+              System.out.println(str);
+          }
+          
     }
 
     /**
@@ -1153,6 +1271,9 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JButton jBLoad;
     private javax.swing.JButton jBRun;
     private javax.swing.JButton jBSelectOutputDirectory;
+    private javax.swing.JComboBox<String> jCBConnectivity;
+    private javax.swing.JComboBox<String> jCBDistances;
+    private javax.swing.JComboBox<String> jCBWatershed;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1172,7 +1293,11 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1192,6 +1317,7 @@ public class DurumDialog extends javax.swing.JDialog {
     private javax.swing.JTextField jTFChalkmaxSize;
     private javax.swing.JTextField jTFChalkminCirc;
     private javax.swing.JTextField jTFChalkminSize;
+    private javax.swing.JTextField jTFDynamic;
     private javax.swing.JTextField jTFFindParticlesmaxCirc;
     private javax.swing.JTextField jTFFindParticlesmaxSize;
     private javax.swing.JTextField jTFFindParticlesminCirc;

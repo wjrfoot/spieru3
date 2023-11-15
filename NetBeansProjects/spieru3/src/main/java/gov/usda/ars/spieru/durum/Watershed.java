@@ -15,13 +15,13 @@ import ij.Prefs;
 public class Watershed {
 
     public static void Watershed(ImagePlus imp) {
-//        IJ.run(imp, "Convert to Mask", "");
-//        IJ.run(imp, "Watershed", "");
-
-        Prefs.blackBackground = false;
         IJ.run(imp, "Convert to Mask", "");
-        IJ.run(imp, "Distance Transform Watershed", "distances=[Quasi-Euclidean (1,1.41)] output=[32 bits] normalize dynamic=2.5 connectivity=8");
-        IJ.setAutoThreshold(imp, "Default");
-        IJ.setThreshold(imp, 3, 10000000000000000000000000000.);
+        IJ.run(imp, "Watershed", "");
+
+//        Prefs.blackBackground = false;
+//        IJ.run(imp, "Convert to Mask", "");
+//        IJ.run(imp, "Distance Transform Watershed", "distances=[Quasi-Euclidean (1,1.41)] output=[32 bits] normalize dynamic=2.5 connectivity=8");
+//        IJ.setAutoThreshold(imp, "Default");
+//        IJ.setThreshold(imp, 3, 10000000000000000000000000000.);
     }
 }

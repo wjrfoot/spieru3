@@ -6,12 +6,16 @@ package gov.usda.ars.spieru.durum;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.Prefs;
 import ij.gui.Roi;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
+import ij.process.ImageProcessor;
+import inra.ijpb.binary.distmap.ChamferMask2D;
+import inra.ijpb.binary.distmap.ChamferMasks2D;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -29,6 +33,8 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import java.text.DecimalFormat;
 import javax.swing.WindowConstants;
+
+import java.awt.image.ImageProducer;
 
 /**
  *
@@ -168,6 +174,12 @@ public class AnalyzeScan {
 
     }
 
+    private ChamferMask2D chamferMask = null;
+    
+    public void setChamferMask(String maskLabel) {
+            chamferMask = ChamferMasks2D.fromLabel(maskLabel).getMask();
+    }
+            
     private SummaryOutput calcSummaryInfo(List<DetailOutput> detailOutputList) {
 
         SummaryOutput summaryOutput = new SummaryOutput();
@@ -303,28 +315,48 @@ public class AnalyzeScan {
         baseImagePlus.getCanvas().addMouseListener(new MyMouseListner(baseImagePlus));
 
         ImagePlus imp = baseImagePlus.duplicate();
-        imp.setTitle(getFileName());
+//        imp.setTitle(getFileName());
+        imp.setTitle("find mask");
         
-        int[] dims = imp.getDimensions();
-        
-        
-//        IJ.run(imp, "Gaussian Blur...", "sigma=3");
-//        IJ.run(imp, "Convert to Mask", "");
-////        imp = imp.resize(842, 1310, "bilinear");
-//        imp = imp.resize(dims[0]/2, dims[1]/2, "bilinear");
-//        IJ.run(imp, "Convert to Mask", "");
-//        IJ.run(imp, "Fill Holes", "");
-////        imp = imp.resize(1684, 2620, "bilinear");
-//        imp = imp.resize(dims[0], dims[1], "bilinear");
+            IJ.run(imp, "8-bit", "");
+        IJ.setAutoThreshold(imp, "Default dark no-reset");
+         imp.getProcessor().threshold(100, 255);
+       IJ.run(imp, "Convert to Mask", "");
+//        ImagePlus imp = imp.duplicate();
+        IJ.run(imp, "Fill Holes", "");
+        IJ.run(imp, "Convert to Mask", "");
 //        IJ.run(imp, "Watershed", "");
-//        IJ.run(imp, "Convert to Mask", "");
-
-
-//        IJ.run(imp, "Convert to Mask", "");
-//IJ.run(imp, "Watershed", "");
-//        Watershed.Watershed(imp);
-//IJ.run(imp, "Analyze Particles...", "size=1000-15000  circularity=0.20-1.00 show=Outlines display exclude clear summarize add");
+//        IJ.run(imp, "Distance Transform Watershed", "distances=[Chessboard (1,1)] output=[32 bits] normalize dynamic=1 connectivity=4");
+ 
+        DistanceTransformWatershedMod dtwm = new DistanceTransformWatershedMod();
         
+        dtwm.setChamberMaks(chamferMask);
+       dtwm.setup("", imp);
+        dtwm.run(imp.getProcessor());
+
+//        imp.setTitle("2");
+//        imp.show();;
+//        imp = imp.duplicate();
+
+//        IJ.run(imp, "Distance Transform Watershed", "distances=[Chessboard (1,1)] output=[32 bits] normalize dynamic=1 connectivity=4");
+        ImageConverter.setDoScaling(true);
+        IJ.run(imp, "8-bit", "");
+//        IJ.setAutoThreshold(imp, "Default dark no-reset");
+        imp.getProcessor().threshold(1, 255);
+
+//        imp.setTitle("3");
+//        imp.show();;
+//        imp = imp.duplicate();
+
+        imp.getProcessor().invert();
+        imp.getProcessor().erode();
+//        imp.getProcessor().erode();
+        IJ.run(imp, "Convert to Mask", "");
+        IJ.run(imp, "Analyze Particles...", "size=500-20000 circularity=0.20-1.00 display composite");
+
+//        imp.setTitle("4");
+//        imp.show();
+         
         RoiManager roiManager = new RoiManager(false);
         ResultsTable resultsTable = new ResultsTable();
 
