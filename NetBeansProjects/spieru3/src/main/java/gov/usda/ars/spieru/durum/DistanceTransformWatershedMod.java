@@ -73,7 +73,8 @@ public class DistanceTransformWatershedMod implements PlugInFilter, ExtendedPlug
     /**
      * the different weights
      */
-    private ChamferMask2D chamferMask = ChamferMask2D.CHESSBOARD;
+    private ChamferMask2D chamferMask = ChamferMask2D.BORGEFORS;
+//    private ChamferMask2D chamferMask = ChamferMask2D.CHESSBOARD;
     private static boolean floatProcessing = true;
     private static boolean normalize = true;
 

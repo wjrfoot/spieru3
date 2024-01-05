@@ -11,7 +11,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,14 +30,13 @@ import java.util.logging.Logger;
 public class Config {
 
     //<editor-fold defaultstate="collapsed" desc="getters/setters">
-    
     /**
      * @return the bucketBounds
      */
     public String getBucketBounds() {
         return bucketBounds;
     }
-    
+
     public double[] getBucketBounds(int arg) {
         double[] bounds = null;
         String[] parsedBounds = getBucketBounds().split(",");
@@ -403,33 +406,35 @@ public class Config {
 //</editor-fold>
 
     private Properties properties = new Properties();
-    private String propertiesFileName = "durum.xml";
+    private final String propertiesFileName = "durum.xml";
 
-    private String FindParticlesMinSize = "FindParticlesMinSize";
-    private String FindParticlesMaxSize = "FindParticlesMaxSize";
-    private String FindParticlesMinCirc = "FindParticlesMinCirc";
-    private String FindParticlesMaxCirc = "FindParticlesMaxCirc";
-    
-    private String ChalkThresholdLow = "ChalkThresholdLow";
-    private String ChalkThresholdHigh = "ChalkThresholdHigh";
-    private String ChalkMinSize = "ChalkMinSize";
-    private String ChalkMaxSize = "ChalkMaxSize";
-    private String ChalkMinCirc = "ChalkMinCirc";
-    private String ChalkMaxCirc = "ChalkMaxCirc";
-    
-    private String KernelThresholdLow = "KernelThresholdLow";
-    private String KernelThresholdHigh = "KernelThresholdHigh";
-    private String KernelMinSize = "KernelMinSize";
-    private String KernelMaxSize = "KernelMaxSize";
-    private String KernelMinCirc = "KernelMinCirc";
-    private String KernelMaxCirc = "KernelMaxCirc";
-    
-    private String BucketBounds = "BucketBounds";
-    private String BucketLabels = "BucketLabels";
+    private final String FindParticlesMinSize = "FindParticlesMinSize";
+    private final String FindParticlesMaxSize = "FindParticlesMaxSize";
+    private final String FindParticlesMinCirc = "FindParticlesMinCirc";
+    private final String FindParticlesMaxCirc = "FindParticlesMaxCirc";
 
-    private String LastImageDirectory = "LastInputDirectory";
-    private String OutputFileName = "OutputFileName";
-    private String OutputDirectory = "OutputDirectory";
+    private final String ChalkThresholdLow = "ChalkThresholdLow";
+    private final String ChalkThresholdHigh = "ChalkThresholdHigh";
+    private final String ChalkMinSize = "ChalkMinSize";
+    private final String ChalkMaxSize = "ChalkMaxSize";
+    private final String ChalkMinCirc = "ChalkMinCirc";
+    private final String ChalkMaxCirc = "ChalkMaxCirc";
+
+    private final String KernelThresholdLow = "KernelThresholdLow";
+    private final String KernelThresholdHigh = "KernelThresholdHigh";
+    private final String KernelMinSize = "KernelMinSize";
+    private final String KernelMaxSize = "KernelMaxSize";
+    private final String KernelMinCirc = "KernelMinCirc";
+    private final String KernelMaxCirc = "KernelMaxCirc";
+    
+    private final String WaterShed = "WaterShed {none,basic,dtwm}";
+
+    private final String BucketBounds = "BucketBounds";
+    private final String BucketLabels = "BucketLabels";
+
+    private final String LastImageDirectory = "LastInputDirectory";
+    private final String OutputFileName = "OutputFileName";
+    private final String OutputDirectory = "OutputDirectory";
 
     public static void main(String[] args) {  // quick and dirty instead of using junit
         String dirS = System.getProperty("user.home");
@@ -454,20 +459,20 @@ public class Config {
     private String minCircKernel = "0.21";
     private String maxCircKernel = "0.99";
 
-    private String lowThresholdChalk = "185";
+    private String lowThresholdChalk = "170";
     private String hiThresholdChalk = "254";
     private String minSizeChalk = "1200";
     private String maxSizeChalk = "13000";
     private String minCircChalk = "0.22";
     private String maxCircChalk = "0.98";
-    
+
     private String bucketBounds = "0.1,0.2,0.5,10.";
     private String bucketLabels = "Min, Lo, Med, Hi";
-    
+
     private String lastImageDirectory = System.getProperty("user.home") + "\\Documents";
     private String outputFileName = "dumum";
     private String outputDirectory = System.getProperty("user.home") + "\\Documents";
-    
+
     public void loadProperties() {
         File localDir = new File(System.getProperty("user.home"), "AppData\\Local\\ARS-SPIERU");
         if (localDir.exists()) {
@@ -476,26 +481,26 @@ public class Config {
                 try {
                     InputStream is = new FileInputStream(localFile);
                     properties.loadFromXML(is);
-                    
+
                     setMinCircFindParticles((String) properties.get(FindParticlesMinCirc));
                     setMaxCircFindParticles((String) properties.get(FindParticlesMaxCirc));
                     setMinSizeFindParticles((String) properties.get(FindParticlesMinSize));
                     setMaxSizeFindParticles((String) properties.get(FindParticlesMaxSize));
-                    
+
                     setLowThresholdKernel((String) properties.get(KernelThresholdLow));
                     setHiThresholdKernel((String) properties.get(KernelThresholdHigh));
                     setMinCircKernel((String) properties.get(KernelMinCirc));
                     setMaxCircKernel((String) properties.get(KernelMaxCirc));
                     setMinSizeKernel((String) properties.get(KernelMinSize));
                     setMaxSizeKernel((String) properties.get(KernelMaxSize));
-           
+
                     setLowThresholdChalk((String) properties.get(ChalkThresholdLow));
                     setHiThresholdChalk((String) properties.get(ChalkThresholdHigh));
                     setMinCircChalk((String) properties.get(ChalkMinCirc));
                     setMaxCircChalk((String) properties.get(ChalkMaxCirc));
                     setMinSizeChalk((String) properties.get(ChalkMinSize));
                     setMaxSizeChalk((String) properties.get(ChalkMaxSize));
-                    
+
                     setBucketBounds((String) properties.getProperty(BucketBounds));
                     setBucketLabels((String) properties.getProperty(BucketLabels));
 
@@ -513,20 +518,50 @@ public class Config {
         }
     }
 
+    /**
+     * Gets the entry set from the properties file. This gets all the properties
+     * and their values without using getters and setters.
+     *
+     * @return set of entry -- an entry has a key and value for each property
+     */
+    public Set<Entry<Object, Object>> getProperties() {
+//        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+//            System.out.println(entry.getKey() + " = " + entry.getValue());
+//        }
+//        return "";
+        return properties.entrySet();
+    }
+
+    /**
+     * Sets properties in properties file. Note that keys must only be those in
+     * the set obtained from the getProperites() method.
+     *
+     * @param vector - vector of vectors containing key and value for
+     * properties.
+     */
+    public void setProperties(Vector<Vector> vector) {
+        for (Vector vec : vector) {
+            properties.setProperty((String) vec.get(0), (String) vec.get(1));
+            System.out.println(vec.get(0) + " === " + vec.get(1));
+        }
+
+        writeProperitesFile();
+    }
+
     public void saveProperties() {
-        
+
         properties.setProperty(FindParticlesMinSize, getMinSizeFindParticles());
         properties.setProperty(FindParticlesMaxSize, getMaxSizeFindParticles());
         properties.setProperty(FindParticlesMinCirc, getMinCircFindParticles());
         properties.setProperty(FindParticlesMaxCirc, getMaxCircFindParticles());
-        
+
         properties.setProperty(KernelThresholdLow, getLowThresholdKernel());
         properties.setProperty(KernelThresholdHigh, getHiThresholdKernel());
         properties.setProperty(KernelMinSize, getMinSizeKernel());
         properties.setProperty(KernelMaxSize, getMaxSizeKernel());
         properties.setProperty(KernelMinCirc, getMinCircKernel());
         properties.setProperty(KernelMaxCirc, getMaxCircKernel());
-        
+
         properties.setProperty(ChalkThresholdLow, getLowThresholdChalk());
         properties.setProperty(ChalkThresholdHigh, getHiThresholdChalk());
         properties.setProperty(ChalkMinSize, getMinSizeChalk());
@@ -536,11 +571,15 @@ public class Config {
 
         properties.setProperty(BucketBounds, getBucketBounds());
         properties.setProperty(BucketLabels, getBucketLabels());
-        
+
         properties.setProperty(LastImageDirectory, getLastImageDirectory());
         properties.setProperty(OutputFileName, getOutputFileName());
         properties.setProperty(OutputDirectory, getOutputDirectory());
-        
+
+        writeProperitesFile();
+    }
+
+    private void writeProperitesFile() {
         File localDir = new File(System.getProperty("user.home"), "AppData\\Local\\ARS-SPIERU");
         if (!localDir.exists()) {
             localDir.mkdir();
@@ -555,7 +594,7 @@ public class Config {
         } catch (IOException ex) {
             Logger.getLogger(Config.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
 
+    }
 
 }

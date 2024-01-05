@@ -59,11 +59,7 @@ public class DetailOutput {
     private String fileName = "";
 
     public double getFraction() {
-        try {
-            return chalkArea / kernelArea;
-        } catch (Exception ex) {
-            return Double.NaN;
-        }
+        return (kernelArea == 0.0) ? 0.0 : chalkArea / kernelArea;
     }
 
     public int getBucket(Config config) {
@@ -83,5 +79,12 @@ public class DetailOutput {
         } catch (ArrayIndexOutOfBoundsException aioobe) {
             return "err";
         }
+    }
+    
+    public String notVitreous(Config config) {
+        if (getBucket(config) != 0) {
+            return "***";
+        }
+        return "";
     }
 }

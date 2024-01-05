@@ -15,6 +15,20 @@ import java.util.Date;
  */
 public class SummaryOutput {
 
+    /**
+     * @return the buckets
+     */
+    public int[] getBuckets() {
+        return buckets;
+    }
+
+    /**
+     * @param buckets the buckets to set
+     */
+    public void setBuckets(int[] buckets) {
+        this.buckets = buckets;
+    }
+
     //<editor-fold defaultstate="collapsed" desc="getters/setters">
     
     /**
@@ -153,6 +167,7 @@ public class SummaryOutput {
     private double chalkHiThreshold = 0.0;
     private double kernelLoThreshold = 0.0;
     private double kernelHiThreshold = 0.0;
+    private int[] buckets;
     
     
     public SummaryOutput() {

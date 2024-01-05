@@ -14,8 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -146,21 +148,36 @@ public class Spreadsheet {
 
     void addSummaryTitles(XSSFSheet sheet) {
 
-        String[] items = {"Sample", "Date Time  ", "Count", "Chalk", "Kernel", "Lo Chalk", "Hi Chalk", "Lo Kernel", "hi Kernel"};
-        XSSFRow row = sheet.createRow(1);
+        sheet.setColumnWidth(0, 25 * 256);
+        sheet.setColumnWidth(1, 15 * 256);
+        String[] items1 = {"", "", "", "Area", "", "Threshold", "", "Threshold", "", ""};
+        String[] items2 = {"Sample", "Date Time  ", "Count", "Chalk", "Kernel", "Lo Chalk", "Hi Chalk", "Lo Kernel", "hi Kernel", ""};
+
+        XSSFRow row1 = sheet.createRow(1);
+
+        XSSFRow row2 = sheet.createRow(2);
 
         int cellid = 0;
 
-        for (String obj : items) {
-            Cell cell = row.createCell(cellid++);
+        for (String obj : items1) {
+            Cell cell = row1.createCell(cellid++);
+            cell.setCellValue((String) obj);
+//                cell.setCellValue((String) obj);
+        }
+
+        cellid = 0;
+        for (String obj : items2) {
+            Cell cell = row2.createCell(cellid++);
             cell.setCellValue((String) obj);
 //                cell.setCellValue((String) obj);
         }
         String[] boundLabels = config.getBucketLabels(0);
         for (String obj : boundLabels) {
-            Cell cell = row.createCell(cellid++);
+            if (obj.trim().startsWith("%")) {
+                continue;
+            }
+            Cell cell = row2.createCell(cellid++);
             cell.setCellValue((String) obj);
-//                cell.setCellValue((String) obj);
         }
 
     }
@@ -184,6 +201,9 @@ public class Spreadsheet {
         cellid++;
         Cell cell = null;
         for (String str : boundLabels) {
+            if (str.trim().startsWith("%")) {
+                continue;
+            }
             cell = row.createCell(cellid++);
             cell.setCellStyle(style);
             cell.setCellValue((String) str);
@@ -194,6 +214,9 @@ public class Spreadsheet {
 
         cellid++;
         for (String str : boundLabels) {
+            if (str.trim().startsWith("%")) {
+                continue;
+            }
             cell = row.createCell(cellid++);
             cell.setCellStyle(style);
             cell.setCellValue("%" + str);
@@ -234,14 +257,21 @@ public class Spreadsheet {
         cell.setCellValue(summaryOutput.getKernelLoThreshold());
         cell = row.createCell(cellid++);
         cell.setCellValue(summaryOutput.getKernelHiThreshold());
+        cell = row.createCell(cellid++);
+        cell.setCellValue("");
 //                cell.setCellValue((String) obj);
+
         CellStyle style = workbook.createCellStyle();
         style.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
         double[] bounds = config.getBucketBounds(0);
+        double lastBound = 0;
         for (double bound : bounds) {
-            cell = row.createCell(cellid++);
-            cell.setCellStyle(style);
-            cell.setCellValue(bound);
+            if (lastBound != bound) {
+                cell = row.createCell(cellid++);
+                cell.setCellStyle(style);
+                cell.setCellValue(bound);
+                lastBound = bound;
+            }
 
         }
 
@@ -249,7 +279,9 @@ public class Spreadsheet {
 
     void addDataSummaryLine(SummaryOutput summaryOutput, List<DetailOutput> detailOutputList) {
         XSSFSheet sheet = getSheet(DataSummarySheetName);
-//        sheet.setColumnWidth(1, 50);  // make wide enough for data string
+        sheet.setColumnWidth(0, 25 * 256);
+        sheet.setColumnWidth(1, 15 * 256);
+        //        sheet.setColumnWidth(1, 50);  // make wide enough for data string
         addDataSummaryLine(sheet, summaryOutput, detailOutputList);
 //        sheet.setColumnWidth(1, 50);  // make wide enough for data string
 
@@ -262,12 +294,14 @@ public class Spreadsheet {
 
         String[] bucketLabels = config.getBucketLabels(0);
         int[] counts = new int[bucketLabels.length];
+        List labels = new ArrayList<>(Arrays.asList(bucketLabels));
+        Iterator<String> labelsI = labels.iterator();
 
         for (DetailOutput detailOutput : detailOutputList) {
             try {
-            counts[detailOutput.getBucket(config)]++;
+                counts[detailOutput.getBucket(config)]++;
             } catch (ArrayIndexOutOfBoundsException aioobe) {
-                
+
             }
         }
 
@@ -285,21 +319,31 @@ public class Spreadsheet {
         }
 
         for (int count : counts) {
+            if (labelsI.next().trim().startsWith("%")) {
+                continue;
+            }
             cell = row.createCell(cellid++);
             cell.setCellValue(count);
         }
-            cell = row.createCell(cellid++);
-            cell.setCellValue(total);
+        cell = row.createCell(cellid++);
+        cell.setCellValue(total);
 
+        labelsI = labels.iterator();
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
+        style.setDataFormat(workbook.createDataFormat().getFormat("0.0"));
         cellid++; // put space between counts and percents
+        labelsI = labels.iterator();
         for (int count : counts) {
+            if (labelsI.next().trim().startsWith("%")) {
+                continue;
+            }
             cell = row.createCell(cellid++);
             cell.setCellStyle(style);
             cell.setCellValue(100. * count / total);
-
         }
+        cell = row.createCell(cellid++);
+        cell.setCellStyle(style);
+        cell.setCellValue(100.);
 
     }
 
@@ -307,7 +351,7 @@ public class Spreadsheet {
 
         String inputFileName = summaryOutput.getSampleFileName();
         XSSFSheet sheet = getSheet(inputFileName);
-//        sheet.setColumnWidth(1, 500);  // make wide enough for data string
+        addSummaryTitles(sheet);
         addSampleLogLine(sheet, summaryOutput);
         addBucketSummary(sheet, detailOutputList);
         addDetailTitles(sheet);
@@ -337,7 +381,7 @@ public class Spreadsheet {
 
         for (DetailOutput detailOutput : detailOutputList) {
             try {
-            counts[detailOutput.getBucket(config)]++;
+                counts[detailOutput.getBucket(config)]++;
             } catch (ArrayIndexOutOfBoundsException aioobe) {
                 System.err.println("array index out of bound " + detailOutput.getBucketLabel(config));
             }
@@ -354,27 +398,46 @@ public class Spreadsheet {
         XSSFRow rowValues = sheet.createRow(rowNum++);
 
         CellStyle style = workbook.createCellStyle();
-        style.setDataFormat(workbook.createDataFormat().getFormat("###.%"));
+        style.setDataFormat(workbook.createDataFormat().getFormat("##0.%"));
 
-        for (int idx = 0; idx < bucketLabels.length; idx++) {
-            Cell cell = rowLabels.createCell(idx + 2);
-            cell.setCellValue(bucketLabels[idx]);
-            cell = rowValues.createCell(idx + 2);
-            cell.setCellValue(counts[idx]);
-            cell = rowLabels.createCell(idx + 8);
-            cell.setCellValue(bucketLabels[idx]);
-            cell = rowValues.createCell(idx + 8);
-            cell.setCellStyle(style);
-            cell.setCellValue(counts[idx] * 1.0 / total);
+        int cdx = 0;
+        for (String bucket : bucketLabels) {
+            if (bucket.trim().startsWith("%")) {
+                continue;
+            }
+            Cell cell = rowLabels.createCell(cdx + 2);
+            cell.setCellValue(bucket);
+            cell = rowLabels.createCell(cdx + 9);
+            cell.setCellValue(bucket);
+           
+            cdx++;
         }
 
-        Cell cell = rowLabels.createCell(counts.length + 2);
+        cdx = 0;
+        int idx = 0;
+        for (String bucket : bucketLabels) {
+            if (bucket.trim().startsWith("%")) {
+                idx++;
+                continue;
+            }
+            
+            Cell cell = rowValues.createCell(cdx + 2);
+            cell.setCellValue(counts[idx]);
+            cell = rowValues.createCell(cdx + 9);
+            cell.setCellStyle(style);
+            cell.setCellValue(counts[idx] * 1.0 / total);
+            
+            idx++;
+            cdx++;
+        }
+
+        Cell cell = rowLabels.createCell(cdx + 2);
         cell.setCellValue("Total");
-        cell = rowValues.createCell(counts.length + 2);
+        cell = rowValues.createCell(cdx + 2);
         cell.setCellValue(total);
-        cell = rowLabels.createCell(counts.length + 8);
+        cell = rowLabels.createCell(cdx + 9);
         cell.setCellValue("Total");
-        cell = rowValues.createCell(counts.length + 8);
+        cell = rowValues.createCell(cdx + 9);
         cell.setCellStyle(style);
         cell.setCellValue(1.0);
 
@@ -397,11 +460,7 @@ public class Spreadsheet {
             cell.setCellValue(detailOutput.getChalkArea());
 
             CellStyle style = workbook.createCellStyle();
-//        style.setAlignment(HorizontalAlignment.CENTER);
-//        style.setVerticalAlignment(VerticalAlignment.CENTER);
-//        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-//        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            style.setDataFormat(workbook.createDataFormat().getFormat("0.00"));
+            style.setDataFormat(workbook.createDataFormat().getFormat("0.0"));
 
             cell = row.createCell(cellid++);
             cell.setCellStyle(style);
@@ -409,15 +468,15 @@ public class Spreadsheet {
 
             style = workbook.createCellStyle();
             style.setAlignment(HorizontalAlignment.CENTER);
-//        style.setVerticalAlignment(VerticalAlignment.CENTER);
-//        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-//        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
             cell = row.createCell(cellid++);
             cell.setCellStyle(style);
             cell.setCellValue(detailOutput.getBucketLabel(config));
 
-//                cell.setCellValue((String) obj);
+            cell = row.createCell(cellid++);
+            cell.setCellStyle(style);
+            cell.setCellValue(detailOutput.notVitreous(config));
+
         }
 
     }

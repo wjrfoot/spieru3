@@ -10,12 +10,15 @@ import ij.Prefs;
 import ij.gui.Roi;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
+import ij.plugin.ImageCalculator;
+import ij.plugin.Thresholder;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 import inra.ijpb.binary.distmap.ChamferMask2D;
 import inra.ijpb.binary.distmap.ChamferMasks2D;
+import inra.ijpb.plugins.DistanceTransformWatershed3D;
 import java.awt.EventQueue;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
@@ -43,6 +46,20 @@ import java.awt.image.ImageProducer;
 public class AnalyzeScan {
 
     /**
+     * @return the imageRecord
+     */
+    public ImageRecord getImageRecord() {
+        return imageRecord;
+    }
+
+    /**
+     * @param imageRecord the imageRecord to set
+     */
+    public void setImageRecord(ImageRecord imageRecord) {
+        this.imageRecord = imageRecord;
+    }
+
+    /**
      * subImagePlusList is the main data object. The object contains a list of
      * SubImagePlus instances. The SubImagePlus object contains an ImagePlus
      * instance holds the image and meta-data of an individual kernel, the
@@ -63,18 +80,19 @@ public class AnalyzeScan {
     private double maxCirc = 1.0;
     private double threshold = 160;
 
-    private double[] buckets = {0.1, 0.2, 0.5, 1.0};
-    private String[] xLabels = {"Min", "Lo", "Med", "Hi"};
+//    private double[] buckets = {0.1, 0.2, 0.5, 1.0};
+//    private String[] xLabels = {"Min", "Lo", "Med", "Hi"};
+    private ImageRecord imageRecord = null;
+    private AnalyzeScanWorker analyzeScanWorker = null;
 
     ResultsTable resultsTable = new ResultsTable();
 
     ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE, Measurements.AREA,
             resultsTable, minSize, maxSize, minCirc, maxCirc);
 
-    private static boolean exitFlg = false;
-
+//    private static boolean exitFlg = false;
     public static void main(String[] args) {
-        exitFlg = true;
+//        exitFlg = true;
         System.out.println("starting analyze");
         File dirF = new File(System.getProperty("user.dir"), "images");
         File imageF = new File(dirF, "img012.tif");
@@ -94,8 +112,8 @@ public class AnalyzeScan {
         System.out.println("filename " + dirF.getAbsolutePath() + " " + dirF.exists());
         setFileName(dirF.getAbsolutePath());
         setConfig(new Config());
-        buckets = getConfig().getBucketBounds(0);
-        xLabels = getConfig().getBucketLabels(0);
+//        buckets = getConfig().getBucketBounds(0);
+//        xLabels = getConfig().getBucketLabels(0);
 //        setFileName(FindLastPictureFile.getLastFileName());
     }
 
@@ -105,10 +123,34 @@ public class AnalyzeScan {
      * @param fileName
      */
     public AnalyzeScan(String fileName, Config config) {
-        setFileName(fileName);
+        this(new ImageRecord(new File(fileName)), config);
+    }
+
+    /**
+     * uses specified file
+     *
+     * @param fileName
+     */
+    public AnalyzeScan(ImageRecord imageRecord, Config config, AnalyzeScanWorker analyzeScanWorker) {
+        this.analyzeScanWorker = analyzeScanWorker;
+        setFileName(imageRecord.getFile().getAbsolutePath());
         setConfig(config);
-        buckets = getConfig().getBucketBounds(0);
-        xLabels = getConfig().getBucketLabels(0);
+//        buckets = getConfig().getBucketBounds(0);
+//        xLabels = getConfig().getBucketLabels(0);
+        this.imageRecord = imageRecord;
+    }
+
+    /**
+     * uses specified file
+     *
+     * @param fileName
+     */
+    public AnalyzeScan(ImageRecord imageRecord, Config config) {
+        setFileName(imageRecord.getFile().getAbsolutePath());
+        setConfig(config);
+//        buckets = getConfig().getBucketBounds(0);
+//        xLabels = getConfig().getBucketLabels(0);
+        this.imageRecord = imageRecord;
     }
 
     /**
@@ -116,83 +158,127 @@ public class AnalyzeScan {
      */
     public void analyze() {
 
+        int asw = 1;
+        if (analyzeScanWorker != null) {
+            analyzeScanWorker.progressMonitor.setKernelMax(8);
+            analyzeScanWorker.progressMonitor.setKernelValue(asw++);
+        }
+
         ImagePlus baseIP = IJ.openImage(getFileName());
+        if (getImageRecord() != null) {
+            getImageRecord().setImage(baseIP);
+        }
         baseIP.getProcessor().flipHorizontal();
-        File file = new File(getFileName());        
+        File file = new File(getFileName());
         baseIP.setTitle(file.getName());
-        baseIP.show();
+//        if (getImageRecord() == null) {
+//            
+//            baseIP.show();
+//        }
         baseIP = baseIP.duplicate();
+            if (analyzeScanWorker != null) {
+                analyzeScanWorker.doPublish(asw++);
+            }
+
 
         Roi[] rois = FindROIs(baseIP);
+//        getImageRecord().setRoiImage(baseIP.duplicate());
+
+            if (analyzeScanWorker != null) {
+                analyzeScanWorker.doPublish(asw++);
+            }
 
         subImagePlusList = makeSubImagePlusList(baseIP, rois);
 
-        PrintWriter pw = null;
+            if (analyzeScanWorker != null) {
+                analyzeScanWorker.doPublish(asw++);
+            }
 
+//        PrintWriter pw = null;
         List<DetailOutput> detailOutputList = new ArrayList<>();
 
-        try {
-            File dirF = new File(System.getProperty("user.dir"), "data");
-            String fileName = System.currentTimeMillis() + ".txt";
-            File outF = new File(dirF, fileName);
-            pw = new PrintWriter(outF);
+        int cnt = 1;
 
-            int cnt = 1;
+//      process the individual kernels   
+        int imagecnt = 0;
+        for (SubImagePlus sip : subImagePlusList) {
 
-            for (SubImagePlus sip : subImagePlusList) {
+            getImageRecord().addSubImage(sip.getOriginalIP());
 
-                DetailOutput detailOutput = new DetailOutput();
-                detailOutput.setFileName(new File(getFileName()).getName());
+            DetailOutput detailOutput = new DetailOutput();
+            detailOutput.setFileName(new File(getFileName()).getName());
 
-                processKernel(sip, detailOutput);
+            processKernel(sip, detailOutput, getImageRecord());
 
-                processChalk(sip, detailOutput);
+            processChalk(sip, detailOutput, getImageRecord());
 
-                processResults(sip, pw, cnt++, false);
+            processResults(sip, null, cnt++, false);
 
-                detailOutputList.add(detailOutput);
-            }
-            System.out.println("done process");
-        } catch (IOException ex) {
-            Logger.getLogger(AnalyzeScan.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            pw.close();
+            detailOutputList.add(detailOutput);
+
         }
+            if (analyzeScanWorker != null) {
+                analyzeScanWorker.doPublish(asw++);
+            }
 
         // create bar chart output
         // @todo make buckets and xLabels configurable
-        EventQueue.invokeLater(() -> {
-            ResultsBarChart ex = new ResultsBarChart(subImagePlusList, buckets,
-                    xLabels, fileName);
-            if (exitFlg) {
-                ex.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        EventQueue.invokeLater(() -> {
+//            ResultsBarChart ex = new ResultsBarChart(subImagePlusList, buckets,
+//                    xLabels, fileName);
+//            if (exitFlg) {
+//                ex.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//            }
+////            ex.setVisible(true);
+//        });
+        SummaryOutput summaryOutput = calcSummaryInfo(detailOutputList,
+                config.getBucketBounds(1));
+
+            if (analyzeScanWorker != null) {
+                analyzeScanWorker.doPublish(asw++);
             }
-            ex.setVisible(true);
-        });
 
-        updateSpreadSheet(detailOutputList);
+        getImageRecord().setDetailOutputList(detailOutputList);
+        getImageRecord().setSummaryOutput(summaryOutput);
+            if (analyzeScanWorker != null) {
+                analyzeScanWorker.doPublish(asw++);
+            }
+
+
+        updateSpreadSheet(detailOutputList, summaryOutput);
+            if (analyzeScanWorker != null) {
+                analyzeScanWorker.doPublish(asw++);
+            }
+
 
     }
 
-    private ChamferMask2D chamferMask = null;
-    
-    public void setChamferMask(String maskLabel) {
-            chamferMask = ChamferMasks2D.fromLabel(maskLabel).getMask();
-    }
-            
-    private SummaryOutput calcSummaryInfo(List<DetailOutput> detailOutputList) {
+    private SummaryOutput calcSummaryInfo(List<DetailOutput> detailOutputList,
+            double[] bucketBounds) {
 
         SummaryOutput summaryOutput = new SummaryOutput();
 
         double kernelArea = 0;
         double chalkArea = 0;
         int count = 0;
+        int[] bucketCounts = new int[bucketBounds.length + 1];
 
         for (DetailOutput detailOutput : detailOutputList) {
             chalkArea += detailOutput.getChalkArea();
             kernelArea += detailOutput.getKernelArea();
             count++;
+
+            double ratio = detailOutput.getChalkArea() / detailOutput.getKernelArea();
+            for (int idx = 0; idx < bucketBounds.length; idx++) {
+                if (ratio <= bucketBounds[idx]) {
+                    bucketCounts[idx + 1]++;
+                    bucketCounts[0]++;
+                    break;
+                }
+            }
         }
+
+        summaryOutput.setBuckets(bucketCounts);
 
         summaryOutput.setChalkArea(chalkArea);
         summaryOutput.setKernelArea(kernelArea);
@@ -208,9 +294,8 @@ public class AnalyzeScan {
         return summaryOutput;
     }
 
-    void updateSpreadSheet(List<DetailOutput> detailOutputList) {
-
-        SummaryOutput summaryOutput = calcSummaryInfo(detailOutputList);
+    void updateSpreadSheet(List<DetailOutput> detailOutputList,
+            SummaryOutput summaryOutput) {
 
         Spreadsheet spreadsheet = new Spreadsheet(config);
 
@@ -266,15 +351,6 @@ public class AnalyzeScan {
 
     }
 
-    private void dumpResultsTable(ResultsTable rs) {
-        System.out.println("Results Table " + rs.getCounter());
-        System.out.println(rs.getColumnHeadings());
-        for (int idx = 0; idx < rs.getCounter(); idx++) {
-            System.out.println(rs.getRowAsString(idx));
-
-        }
-    }
-
     /**
      * takes the bounding box for each kernel found in analyze particles and
      * splits each kernel into a separate, fairly small, image object
@@ -311,33 +387,77 @@ public class AnalyzeScan {
      */
     private Roi[] FindROIs(ImagePlus baseImagePlus) {
 
-        baseImagePlus.show();
-        baseImagePlus.getCanvas().addMouseListener(new MyMouseListner(baseImagePlus));
+//        if (imageRecord == null) {
+//            baseImagePlus.show();
+        ImagePlus maskImage = baseImagePlus.duplicate();
 
+        ImageConverter imageConverter = new ImageConverter(maskImage);
+        imageConverter.convertToGray8();
+
+//	setAutoThreshold("Default dark");
+//        maskImage.getProcessor().setAutoThreshold("Default Red");
+//                maskImage.getProcessor().threshold(190, 255);
+        maskImage.getProcessor().threshold(170, 255);
+//maskImage.getProcessor().setThreshold(0, 255-170);
+        IJ.run(maskImage, "Convert to Mask", "");
+//        maskImage.getProcessor().invert();
+
+//        ImagePlus resultImage = ImageCalculator.run(baseImagePlus, maskImage, "min create 32-bit");
+//        getImageRecord().setRoiImage(resultImage);
+//        resultImage.setTitle("ROI image");
+
+// @todo fix this
+        ImagePlus imp2 = baseImagePlus.duplicate();
+        IJ.run(imp2, "8-bit", "");
+        IJ.run("Close");
+        IJ.setAutoThreshold(imp2, "Default dark no-reset");
+        IJ.setRawThreshold(imp2, 170, 255);
+        getImageRecord().setRoiImage(imp2);
+
+//        resultImage.show();
+//            baseImagePlus.getCanvas().addMouseListener(new MyMouseListner(baseImagePlus));
+//        }
         ImagePlus imp = baseImagePlus.duplicate();
 //        imp.setTitle(getFileName());
         imp.setTitle("find mask");
-        
-            IJ.run(imp, "8-bit", "");
+
+        IJ.run(imp, "8-bit", "");
+        imp.getProcessor().convertToByte(false);
+//        imp.getProcessor().createMask();
+
         IJ.setAutoThreshold(imp, "Default dark no-reset");
-         imp.getProcessor().threshold(100, 255);
-       IJ.run(imp, "Convert to Mask", "");
+        imp.getProcessor().threshold(100, 255);
+        IJ.run(imp, "Convert to Mask", "");
 //        ImagePlus imp = imp.duplicate();
         IJ.run(imp, "Fill Holes", "");
+
         IJ.run(imp, "Convert to Mask", "");
 //        IJ.run(imp, "Watershed", "");
-//        IJ.run(imp, "Distance Transform Watershed", "distances=[Chessboard (1,1)] output=[32 bits] normalize dynamic=1 connectivity=4");
- 
-        DistanceTransformWatershedMod dtwm = new DistanceTransformWatershedMod();
-        
-        dtwm.setChamberMaks(chamferMask);
-       dtwm.setup("", imp);
-        dtwm.run(imp.getProcessor());
+        /*
+            Chessboard (1,1): weight equal to 1 for all neighbors.
+            City-Block (1,2): weights 1 for orthogonal neighbors and 2 for diagonal neighbors.
+            Quasi-Euclidean (1,1.41): weights 1 for orthogonal neighbors and 2–√ for diagonal neighbors.
+            Borgefors (3,4): weights 3 for orthogonal neighbors and 4 for diagonal neighbors (best approximation of Euclidean distance for 3-by-3 masks).
+            Weights (2,3): weights 2 for orthogonal neighbors and 3 for diagonal neighbors.
+            Weights (5,7): weights 5 for orthogonal neighbors and 7 for diagonal neighbors.
+            Chessknight (5,7,11): weights 5 for orthogonal neighbors and 7 for diagonal neighbors, and 11 for chess-knight moves (best approximation for 5-by-5 
+         */
 
+//            IJ.run(imp, "Distance Transform Watershed", "distances=[Borgefors (3,4)] output=[32 bits] normalize dynamic=2 connectivity=8");
+        DistanceTransformWatershedMod dtwm = new DistanceTransformWatershedMod();
+        dtwm.setChamberMaks(ChamferMask2D.BORGEFORS);
+        dtwm.setConnectivity(8);
+        dtwm.setDynamic(2);
+        dtwm.run(imp.getProcessor());
+//        imp.duplicate().show();
+//        
+//        dtwm.setChamberMaks(ChamferMask2D.BORGEFORS);
+//        dtwm.setChamberMaks(chamferMask);
+//       dtwm.setup("", imp);
+//        dtwm.run(imp.getProcessor());
 //        imp.setTitle("2");
 //        imp.show();;
 //        imp = imp.duplicate();
-
 //        IJ.run(imp, "Distance Transform Watershed", "distances=[Chessboard (1,1)] output=[32 bits] normalize dynamic=1 connectivity=4");
         ImageConverter.setDoScaling(true);
         IJ.run(imp, "8-bit", "");
@@ -347,7 +467,6 @@ public class AnalyzeScan {
 //        imp.setTitle("3");
 //        imp.show();;
 //        imp = imp.duplicate();
-
         imp.getProcessor().invert();
         imp.getProcessor().erode();
 //        imp.getProcessor().erode();
@@ -356,29 +475,26 @@ public class AnalyzeScan {
 
 //        imp.setTitle("4");
 //        imp.show();
-         
         RoiManager roiManager = new RoiManager(false);
         ResultsTable resultsTable = new ResultsTable();
 
-        System.out.printf(" params for watershed %4.0f %6.0f %3.1f %3.1f\n", config.getMinSizeFindParticles(0), config.getMaxSizeFindParticles(0),
-                config.getMinCircFindParticles(0), config.getMaxCircFindParticles(0));
-        System.out.printf(" params for watershed %4.0f %6.0f %3.1f %3.1f\n", minSize, maxSize, minCirc, maxCirc);
+//        System.out.printf(" params for watershed %4.0f %6.0f %3.1f %3.1f\n", config.getMinSizeFindParticles(0), config.getMaxSizeFindParticles(0),
+//                config.getMinCircFindParticles(0), config.getMaxCircFindParticles(0));
+//        System.out.printf(" params for watershed %4.0f %6.0f %3.1f %3.1f\n", minSize, maxSize, minCirc, maxCirc);
 //      
-
         ParticleAnalyzer.setRoiManager(roiManager);
         ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE, Measurements.AREA + Measurements.CENTROID,
                 resultsTable, config.getMinSizeFindParticles(0), config.getMaxSizeFindParticles(0),
                 config.getMinCircFindParticles(0), config.getMaxCircFindParticles(0));
-//        ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE, Measurements.AREA + Measurements.CENTROID,
-//                resultsTable, minSize, maxSize, minCirc, maxCirc);
 
         particleAnalyzer.analyze(imp);
 
         System.out.println("# of kernels " + resultsTable.getCounter() + " " + roiManager.getRoisAsArray().length);
 
-        imp.show();
-        imp.getCanvas().addMouseListener(new MyMouseListner(imp));
-
+//        if (imageRecord == null) {
+//            imp.show();
+//            imp.getCanvas().addMouseListener(new MyMouseListner(imp));
+//        }
         return roiManager.getRoisAsArray();
     }
 
@@ -387,11 +503,11 @@ public class AnalyzeScan {
      *
      * @param sip
      */
-    private void processKernel(SubImagePlus sip, DetailOutput detailOutput) {
+    private void processKernel(SubImagePlus sip, DetailOutput detailOutput,
+            ImageRecord imageRecord) {
 
         ImagePlus ip = sip.getKernelIP().duplicate();
 
-//        ip.duplicate().show();
         ip.setTitle("process kernel");
 
 //	// analyze particles
@@ -411,24 +527,16 @@ public class AnalyzeScan {
         ip.getProcessor().setThreshold(getConfig().getLowThresholdKernel(hiTH),
                 getConfig().getHiThresholdKernel(hiTH), 0);
 
-//	// analyze particles
-//	analyze("Analyze Particles...",
-//	"size=minSz1-30 circularity=0.1-1.00" + 
-//	" show=[Overlay Masks] display");
-        // use different size since we are working in pixels instead of mm
-//        IJ.run(ip, "Analyze Particles...", getConfig().getAnalyzeKernel());
-//        Analyzer analyzer = new Analyzer();
-//        analyzer.setup("size=10-30000 circularity=0.1-1.00", ip);
-//        analyzer.analyze(ip.getProcessor());
         ResultsTable resultsTable = new ResultsTable();
 
+        System.out.printf("chalk params %f %f %f %f\n", config.getMinSizeKernel(0), config.getMaxSizeKernel(0),
+                config.getMinCircKernel(0), config.getMaxCircKernel(0));
         ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE, Measurements.AREA,
                 resultsTable, config.getMinSizeKernel(0), config.getMaxSizeKernel(0),
                 config.getMinCircKernel(0), config.getMaxCircKernel(0));
         particleAnalyzer.analyze(ip);
 
         // save last results, full, table entry into kernel object
-//        ip.show();
         if (resultsTable.getCounter() == 0) {
             sip.setKernelResults("a\ta\ta");
             sip.setKernelArea(0.0);
@@ -441,6 +549,7 @@ public class AnalyzeScan {
             sip.setKernelResults(resultsStr);
             sip.setKernelArea(resultsTable.getValue("Area", 0));
         }
+
         sip.setKernelIP(ip);
 //        ip.show();
     }
@@ -450,8 +559,10 @@ public class AnalyzeScan {
      *
      * @param sip
      */
-    private void processChalk(SubImagePlus sip, DetailOutput detailOutput) {
+    private void processChalk(SubImagePlus sip, DetailOutput detailOutput,
+            ImageRecord imageRecord) {
 
+        System.out.println("processChalk");
         ImagePlus ip = sip.getKernelIP().duplicate();
 
 //	// process the duplicate for chalk
@@ -460,11 +571,11 @@ public class AnalyzeScan {
 //        IJ.run(ip, "Set Measurements...", getConfig().getMeasureParamsBase());
         // try to smooth image and trim tips
 //	analyze("Subtract Background...", "rolling=5 create");
-        IJ.run(ip, "Subtract Background...", "rolling=5 create");
+// should be in?
+//        IJ.run(ip, "Subtract Background...", "rolling=5 create");
 //        BackgroundSubtracter bS = new BackgroundSubtracter();
 //        bS.setup("rolling=5 create dark", ip);
 //        bS.run(ip.getProcessor());
-
 //	// set the threshold for the chalk
 //	analyze("8-bit");
 //        IJ.run(ip, "8-bit", "");
@@ -477,6 +588,9 @@ public class AnalyzeScan {
 //	setThreshold(lowTH, 255);
         ip.getProcessor().setThreshold(config.getLowThresholdChalk(0),
                 config.getHiThresholdChalk(0), 0);
+//        ImagePlus dupIp = ip.duplicate();
+//        dupIp.setTitle("chalk");
+//        dupIp.show();
 
 //	analyze("Analyze Particles...",
 //	"size=minSz1-30 circularity=0.1-1.00" + 
@@ -484,6 +598,8 @@ public class AnalyzeScan {
         // changed size because measurements are pixels instead of mm
         ResultsTable resultsTable = new ResultsTable();
 
+        System.out.printf("kernel params %f %f %f %f\n", config.getMinSizeChalk(0), config.getMaxSizeChalk(0),
+                config.getMinCircChalk(0), config.getMaxCircChalk(0));
         ParticleAnalyzer particleAnalyzer = new ParticleAnalyzer(ParticleAnalyzer.SHOW_NONE, Measurements.AREA,
                 resultsTable, config.getMinSizeChalk(0), config.getMaxSizeChalk(0),
                 config.getMinCircChalk(0), config.getMaxCircChalk(0));
@@ -498,11 +614,17 @@ public class AnalyzeScan {
             System.out.println("chalk " + " area " + resultsTable.getValue("Area", 0));
             String resultsStr = resultsTable.getRowAsString(resultsTable.getCounter() - 1);
             detailOutput.setChalkArea(resultsTable.getValue("Area", 0));
+            System.out.println("chalk area " + resultsTable.getValue("Area", 0));
             sip.setChalkResults(resultsStr);
             double area = resultsTable.getValue("Area", resultsTable.getCounter() - 1);
             sip.setChalkArea(area);
 //        sip.setChalkArea(resultsTable.getValue("Area", 0));
         }
+
+        if (imageRecord != null) {
+            imageRecord.setChalkResultsTable(resultsTable);
+        }
+
         sip.setChalkIP(ip);
 //        ip.show();
     }
@@ -539,10 +661,12 @@ public class AnalyzeScan {
         private int imageWidth;
 
         public MyMouseListner(ImagePlus ip) {
-            canvasHeight = ip.getCanvas().getHeight();
-            canvasWidth = ip.getCanvas().getWidth();
-            imageHeight = ip.getHeight();
-            imageWidth = ip.getWidth();
+            if (getImageRecord() == null) {
+                canvasHeight = ip.getCanvas().getHeight();
+                canvasWidth = ip.getCanvas().getWidth();
+                imageHeight = ip.getHeight();
+                imageWidth = ip.getWidth();
+            }
         }
 
         @Override
